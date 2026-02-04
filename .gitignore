@@ -42,8 +42,11 @@ test_env/
 # Manim output
 media/
 CASES/
-*.mp4
 *.mov
+
+# Ignore mp4 files except in assets/videos/examples/
+*.mp4
+!assets/videos/examples/*.mp4
 
 # API keys and secrets
 .env
@@ -60,3 +63,11 @@ htmlcov/
 *.tmp
 *.temp
 .cache/
+temp_docx_content.txt
+
+# Python environment files
+python_env_diagnosis.md
+python_env_summary.md
+fix_python_path.ps1
+fix_python_path_simple.ps1
+setup_python_env.ps1

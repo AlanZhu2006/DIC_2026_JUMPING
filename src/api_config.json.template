@@ -1,0 +1,40 @@
+{
+    "gemini": {
+        "base_url": "https://api.chatanywhere.tech/v1",
+        "api_version": "2024-03-01-preview",
+        "api_key": "YOUR_CHATANYWHERE_API_KEY",
+        "model": "gemini-pro"
+    },
+    "gpt41": {
+        "base_url": "https://api.chatanywhere.tech/v1",
+        "api_version": "2024-03-01-preview",
+        "api_key": "YOUR_CHATANYWHERE_API_KEY",
+        "model": "gpt-3.5-turbo"
+    },
+    "gpt5": {
+        "base_url": "https://api.chatanywhere.tech/v1",
+        "api_version": "2024-03-01-preview",
+        "api_key": "YOUR_CHATANYWHERE_API_KEY",
+        "model": "gpt-5-chat-2025-08-07"
+    },
+    "gpto4mini": {
+        "base_url": "https://api.chatanywhere.tech/v1",
+        "api_version": "2024-03-01-preview",
+        "api_key": "YOUR_CHATANYWHERE_API_KEY",
+        "model": "o4-mini-2025-04-16"
+    },
+    "gpt4o": {
+        "base_url": "https://api.chatanywhere.tech/v1",
+        "api_version": "2024-03-01-preview",
+        "api_key": "YOUR_CHATANYWHERE_API_KEY",
+        "model": "gpt-4o-2024-11-20"
+    },
+    "claude": {
+        "base_url": "https://api.chatanywhere.tech/v1",
+        "api_key": "YOUR_CHATANYWHERE_API_KEY",
+        "model": "claude-3-opus"
+    },
+    "iconfinder": {
+        "api_key": "YOUR_ICONFINDER_KEY"
+    }
+}

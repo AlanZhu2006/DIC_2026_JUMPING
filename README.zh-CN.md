@@ -126,6 +126,18 @@ pip install -r requirements.txt
 
 ### 3. 配置 API 密钥
 
+**重要提示**：`src/api_config.json` 文件已从 Git 中排除以保护安全。您需要从模板创建它。
+
+#### 步骤 1：创建 API 配置文件
+
+```powershell
+# 复制模板文件
+cd src
+Copy-Item api_config.json.template api_config.json
+```
+
+#### 步骤 2：获取 API 密钥
+
 #### 方案 1：ChatAnywhere 免费 API（推荐用于测试）
 
 [ChatAnywhere](https://github.com/chatanywhere/GPT_API_free) 提供免费的 API 转发服务，支持多种模型。一个 API Key 可用于所有模型！
@@ -133,7 +145,7 @@ pip install -r requirements.txt
 **步骤**：
 1. 访问 https://github.com/chatanywhere/GPT_API_free
 2. 使用 GitHub 账号登录并获取免费 API Key
-3. 编辑 `src/api_config.json`:
+3. 编辑 `src/api_config.json`，将 `YOUR_CHATANYWHERE_API_KEY` 替换为您的实际 API Key：
 
 ```json
 {
@@ -201,6 +213,11 @@ pip install -r requirements.txt
 cd src
 python test_api_connection.py
 ```
+
+**安全提示**：
+- ✅ `src/api_config.json` 已从 Git 中排除（在 `.gitignore` 中）
+- ✅ 模板文件 `src/api_config.json.template` 已提供作为参考
+- ⚠️ 永远不要将真实的 API 密钥提交到仓库
 
 ### 4. 生成教学视频
 
@@ -285,7 +302,7 @@ media/videos/complex_example/[quality]/ComplexExample.mp4
 #### 视频预览
 
 <video width="800" controls>
-  <source src="media/videos/complex_example/480p15/ComplexExample.mp4" type="video/mp4">
+  <source src="assets/videos/examples/ComplexExample.mp4" type="video/mp4">
   您的浏览器不支持视频标签。
 </video>
 
@@ -354,7 +371,7 @@ src/CASES/TEST-single_Chatgpt41/0-Circle_area_formula/
 #### 视频预览
 
 <video width="800" controls>
-  <source src="src/CASES/TEST-single_Chatgpt41/0-Circle_area_formula/Circle_area_formula.mp4" type="video/mp4">
+  <source src="assets/videos/examples/Circle_area_formula.mp4" type="video/mp4">
   您的浏览器不支持视频标签。
 </video>
 

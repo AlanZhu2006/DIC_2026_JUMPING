@@ -126,6 +126,18 @@ pip install -r requirements.txt
 
 ### 3. Configure API Keys
 
+**Important**: The `src/api_config.json` file is excluded from Git for security. You need to create it from the template.
+
+#### Step 1: Create API Configuration File
+
+```powershell
+# Copy the template file
+cd src
+Copy-Item api_config.json.template api_config.json
+```
+
+#### Step 2: Get API Keys
+
 #### Option 1: ChatAnywhere Free API (Recommended for Testing)
 
 [ChatAnywhere](https://github.com/chatanywhere/GPT_API_free) provides free API forwarding service supporting multiple models. One API key works for all models!
@@ -133,25 +145,25 @@ pip install -r requirements.txt
 **Steps**:
 1. Visit https://github.com/chatanywhere/GPT_API_free
 2. Use GitHub account to login and get free API key
-3. Edit `src/api_config.json`:
+3. Edit `src/api_config.json` and replace `YOUR_CHATANYWHERE_API_KEY` with your actual API key:
 
 ```json
 {
     "gpt41": {
         "base_url": "https://api.chatanywhere.tech/v1",
         "api_version": "2024-03-01-preview",
-        "api_key": "sk-YOUR_CHATANYWHERE_KEY",
+        "api_key": "sk-YOUR_CHATANYWHERE_API_KEY",
         "model": "gpt-3.5-turbo"
     },
     "claude": {
         "base_url": "https://api.chatanywhere.tech/v1",
-        "api_key": "sk-YOUR_CHATANYWHERE_KEY",
+        "api_key": "sk-YOUR_CHATANYWHERE_API_KEY",
         "model": "claude-3-opus"
     },
     "gemini": {
         "base_url": "https://api.chatanywhere.tech/v1",
         "api_version": "2024-03-01-preview",
-        "api_key": "sk-YOUR_CHATANYWHERE_KEY",
+        "api_key": "sk-YOUR_CHATANYWHERE_API_KEY",
         "model": "gemini-pro"
     },
     "iconfinder": {
@@ -201,6 +213,11 @@ Edit `src/api_config.json`:
 cd src
 python test_api_connection.py
 ```
+
+**Security Note**: 
+- ✅ `src/api_config.json` is excluded from Git (in `.gitignore`)
+- ✅ Template file `src/api_config.json.template` is provided for reference
+- ⚠️ Never commit your real API keys to the repository
 
 ### 4. Generate Educational Videos
 
@@ -285,7 +302,7 @@ media/videos/complex_example/[quality]/ComplexExample.mp4
 #### Video Preview
 
 <video width="800" controls>
-  <source src="media/videos/complex_example/480p15/ComplexExample.mp4" type="video/mp4">
+  <source src="assets/videos/examples/ComplexExample.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -354,7 +371,7 @@ src/CASES/TEST-single_Chatgpt41/0-Circle_area_formula/
 #### Video Preview
 
 <video width="800" controls>
-  <source src="src/CASES/TEST-single_Chatgpt41/0-Circle_area_formula/Circle_area_formula.mp4" type="video/mp4">
+  <source src="assets/videos/examples/Circle_area_formula.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
