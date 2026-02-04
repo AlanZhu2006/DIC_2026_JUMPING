@@ -1,214 +1,563 @@
-# Code2Video: 通过代码生成视频
+# VisualKiwi: 基于 Code2Video 的交互式视觉学习平台
 
 <p align="right">
   <a href="./README.md">English</a> | <b>简体中文</b>
 </p>
 
 <p align="center">
-  <b>Code2Video: 以代码为中心的教学视频生成新范式</b>
+  <b>VisualKiwi: 将 LLM 辅助学习转化为交互式视觉理解</b>
+<br>
+  基于 Code2Video 框架的智能教学视频生成系统
 </p>
-<video src="assets/video.mp4" width="600" controls>
-  您的浏览器不支持 video 标签。
-</video>
-
-<p align="center">
-  <a href="https://scholar.google.com.hk/citations?user=9lIMS-EAAAAJ&hl=zh-CN&oi=sra">Yanzhe Chen*</a>,
-  <a href="https://qhlin.me/">Kevin Qinghong Lin*</a>,
-  <a href="https://scholar.google.com/citations?user=h1-3lSoAAAAJ&hl=en">Mike Zheng Shou</a> <br>
-  新加坡国立大学 Show Lab
-</p>
-
-<p align="center">
-  <a href="https://arxiv.org/abs/2510.01174">📄 Arxiv 论文</a> &nbsp; | &nbsp;
-  <a href="https://huggingface.co/papers/2510.01174">🤗 Daily Paper</a> &nbsp; | &nbsp;
-  <a href="https://huggingface.co/datasets/YanzheChen/MMMC">🤗 数据集</a> &nbsp; | &nbsp;
-  <a href="https://showlab.github.io/Code2Video/">🌐 项目主页</a> &nbsp; | &nbsp;
-  <a href="https://x.com/KevinQHLin/status/1974199353695941114">💬 推特 (X)</a>
-</p>
-
-
 
 ---
 
-## 🔥 更新
-- [x] [2025.10.11] 近期收到关于 [ICONFINDER](https://www.iconfinder.com/account/applications) 注册问题的反馈，在 [MMMC](https://huggingface.co/datasets/YanzheChen/MMMC/tree/main/assets) 数据集中更新了 Code2Video 自动收集的 icon，作为临时替代方案。
-- [x] [2025.10.6] 在 Huggingface 上更新了 [MMMC](https://huggingface.co/datasets/YanzheChen/MMMC) 数据集。
-- [x] [2025.10.3] 感谢 @_akhaliq 在 [推特](https://x.com/_akhaliq/status/1974189217304780863)上分享我们的工作！
-- [x] [2025.10.2] 我们发布了 [ArXiv](https://arxiv.org/abs/2510.01174)、[代码](https://github.com/showlab/Code2Video)和[数据集](https://huggingface.co/datasets/YanzheChen/MMMC)。
-- [x] [2025.9.22] Code2Video 已被 **NeurIPS 2025 Workshop ([DL4C](https://dl4c.github.io/))** 接收。
+## 🌟 项目概述
+
+**VisualKiwi** 是一个 **Kiwi 插件**，通过结合多智能体编排、RAG 和网络搜索，将传统的文本式 LLM 学习转化为**交互式视觉理解**。
+
+当前大多数学生主要使用 LLM 进行基于文本的学习（摘要、解释、问答）。然而，许多概念（如几何、物理、算法、统计、化学机制）本质上是**视觉和动态的**。纯文本往往无法传达直觉、时间过程和结构关系。
+
+**VisualKiwi** 可以自动生成以下内容：
+
+- 🎬 **演示视频**（分步动画、带旁白的演练、模拟过程）
+  - 基于 **Code2Video** 框架生成高质量教学视频
+  - 使用 **Remotion** 进行视频编辑和合成
+
+- 📊 **交互式图表和可视化**（可操作的图表、滑块、参数扫描、"假设"探索）
+  - 使用 AG-UI 或自定义协议
+  - 导入开源 SDK 渲染化学公式等
+
+- 📚 **富内容幻灯片**（结构化解释，包含图表、动画和嵌入式交互性）
+  - 使用 Slides MCP
+  - 支持 Mermaid 图表和思维导图
 
 ---
 
-### 目录
-- [🌟 项目总览](#-项目总览)
-- [🚀 快速上手](#-快速上手)
-  - [1. 环境配置](#1-环境配置)
-  - [2. 配置 LLM API 密钥](#2-配置-llm-api-密钥)
-  - [3. 运行智能体](#3-运行智能体)
-  - [4. 项目结构](#4-项目结构)
-- [📊 评测 -- MMMC](#-评测----mmmc)
-- [🙏 致谢](#-致谢)
-- [📌 引用](#-引用)
-- 
----
+## ✅ 部署状态
 
-## 🌟 项目总览
+### 已完成部署步骤
 
-<p align="center">
-  <img src="figures/first.png" alt="Overview" width="90%">
-</p>
+- [x] **阶段 1：环境准备**
+  - ✅ Python 3.11.9 已安装并验证
+  - ✅ 虚拟环境已创建 (`venv/`)
+  - ✅ pip 已升级到 26.0
 
-**Code2Video** 是一个**基于智能体、以代码为中心**的框架，能够根据知识点生成高质量的**教学视频**。
-与基于像素空间的文生视频模型不同，我们的方法生成可执行的 **Manim 代码**来确保视频的**清晰度、连贯性和可复现性**。
+- [x] **阶段 2：系统依赖**
+  - ✅ FFmpeg 8.0.1 已安装并可用
+  - ✅ MiKTeX 24.1 已安装并可用
+  - ✅ 图形库已就绪
 
-**核心特性**:
-- 🎬 **以代码为中心的范式** — 将可执行代码作为统一媒介，同时实现教学视频的时间序列和空间布局组织。
-- 🤖 **模块化三智能体设计** — 规划者 (Planner) 负责故事板扩展，编码员 (Coder) 负责可调试代码的合成，鉴赏家 (Critic) 负责通过视觉锚点（Visual Anchor）优化布局，三者协同完成结构化生成。
-- 📚 **MMMC 基准** — 用于代码驱动视频生成的基准数据集，涵盖了 117 个受 3Blue1Brown 启发的精选学习主题，横跨多个领域。
-- 🧪 **多维度评测** — 从效率、美学和端到端知识传递三个维度进行系统性评估。
+- [x] **阶段 3：Python 依赖**
+  - ✅ 所有 80+ 个包已成功安装
+  - ✅ Manim 0.19.0 已安装
+  - ✅ OpenAI, NumPy, SciPy, OpenCV, MoviePy 均已验证
+
+- [x] **阶段 4：Manim 验证**
+  - ✅ Manim Community v0.19.0 已验证
+  - ✅ 测试场景渲染成功
+  - ✅ 包含 DIC JUMPING 片尾的复杂示例已创建
 
 ---
 
-## 🚀 快速上手
+## 🚀 快速开始
 
-<p align="center">
-  <img src="figures/approach.png" alt="Approach" width="85%">
-</p>
+### 1. 环境设置
 
-### 1. 环境配置
+#### 激活虚拟环境
+
+```powershell
+# Windows PowerShell
+.\venv\Scripts\Activate.ps1
+
+# 激活后验证
+python --version  # 应该显示 Python 3.11.9
+pip --version     # 应该显示 pip 26.0
+```
+
+#### 系统要求
+
+- **Python**: 3.11+ (✅ 3.11.9 已安装)
+- **FFmpeg**: 用于视频处理 (✅ 8.0.1 已安装)
+- **LaTeX**: 用于数学公式 (✅ MiKTeX 24.1 已安装)
+- **内存**: 推荐至少 8GB RAM
+- **存储**: 至少 10GB 可用空间
+
+### 2. 安装依赖
+
+```bash
+# 进入 src 目录
+cd src/
+
+# 安装所有依赖（如果已按部署步骤完成，则无需重复）
+pip install -r requirements.txt
+```
+
+**已安装的关键依赖**:
+- `manim==0.19.0` - 动画引擎
+- `openai==1.90.0` - LLM API
+- `numpy==2.2.6` - 数值计算
+- `scipy==1.15.3` - 科学计算
+- `opencv-python==4.12.0.88` - 图像/视频处理
+- `moviepy==2.2.1` - 视频操作
+
+### 3. 配置 API 密钥
+
+编辑 `src/api_config.json`:
+
+```json
+{
+    "claude": {
+        "base_url": "https://api.anthropic.com/v1/messages",
+        "api_key": "YOUR_CLAUDE_API_KEY"
+    },
+    "gemini": {
+        "base_url": "https://generativelanguage.googleapis.com/v1beta",
+        "api_version": "2024-03-01-preview",
+        "api_key": "YOUR_GEMINI_API_KEY",
+        "model": "gemini-2.5-pro-preview-05-06"
+    },
+    "iconfinder": {
+        "api_key": "YOUR_ICONFINDER_KEY"
+    }
+}
+```
+
+**API 说明**:
+
+- **LLM API** (Claude/GPT)：用于 Planner 和 Coder 智能体
+  - 推荐使用 **Claude-4-Opus** 以获得最佳 Manim 代码质量
+
+- **VLM API** (Gemini)：用于 Planner Critic 智能体
+  - 用于布局和美学优化
+  - 推荐使用 **gemini-2.5-pro-preview-05-06**
+
+- **Visual Assets API** (IconFinder)：用于丰富视频的图标资源（可选）
+
+### 4. 生成教学视频
+
+#### 方式一：单知识点生成
 
 ```bash
 cd src/
-pip install -r requirements.txt
-```
-这里是 Manim Community v0.19.0 的[官方安装指南](https://docs.manim.community/en/stable/installation.html)，以帮助您正确设置环境。
-
-### 2. 配置 LLM API 密钥
-
-请在 `api_config.json` 文件中填入您的 **API key**。
-
-* **LLM API**:
-  * 运行 Planner 和 Coder 所需。
-  * 使用 **Claude-4-Opus** 可获得最佳的 Manim 代码质量。
-  * 使用 **ChatGPT-4.1** 亦具有不错的生成表现。
-* **VLM API**:
-  * 运行 Critic 所需。
-  * 为优化布局和美学，请提供 **Gemini API key**。
-  * 使用 **gemini-2.5-pro-preview-05-06** 可获得最佳质量。
-* **视觉素材 API**:
-  * 为丰富视频内容，请从 [IconFinder](https://www.iconfinder.com/account/applications) 获取并设置 `ICONFINDER_API_KEY`。
-
-### 3. 运行智能体
-
-提供了两种 Shell 脚本，用于不同的生成模式：
-
-#### (a) 单个主题生成
-
-脚本: `run_agent_single.sh`
-
-从脚本中指定的单个**知识点**生成视频。
-
-```bash
-sh run_agent_single.sh --knowledge_point "Linear transformations and matrices"
+sh run_agent_single.sh --knowledge_point "AVL树旋转操作"
 ```
 
-**`run_agent_single.sh` 内部重要参数:**
+**参数说明**（在 `run_agent_single.sh` 中配置）：
 
-* `API`: 指定使用的 LLM。
-* `FOLDER_PREFIX`: 输出文件夹的前缀 (例如, `TEST-single`)。
-* `KNOWLEDGE_POINT`: 目标概念，例如 `"Linear transformations and matrices"`。
+- `API`: 指定使用的 LLM（如 `claude`）
+- `FOLDER_PREFIX`: 输出文件夹前缀（如 `VisualKiwi-single`）
+- `KNOWLEDGE_POINT`: 目标概念，如 `"AVL树旋转操作"`
 
----
-
-#### (b) 完整基准测试模式
-
-脚本: `run_agent.sh`
-
-运行 `long_video_topics_list.json` 中定义的所有（或部分）学习主题。
+#### 方式二：批量生成
 
 ```bash
+cd src/
 sh run_agent.sh
 ```
 
-**`run_agent.sh` 内部重要参数:**
+**参数说明**（在 `run_agent.sh` 中配置）：
 
-* `API`: 指定使用的 LLM。
-* `FOLDER_PREFIX`: 输出文件夹的前缀 (例如, `TEST-LIST`)。
-* `MAX_CONCEPTS`: 要运行的概念数量 (`-1` 表示全部)。
-* `PARALLEL_GROUP_NUM`: 并行运行的组数。
+- `API`: 指定使用的 LLM
+- `FOLDER_PREFIX`: 输出文件夹前缀（如 `VisualKiwi-batch`）
+- `MAX_CONCEPTS`: 要包含的概念数量（`-1` 表示全部）
+- `PARALLEL_GROUP_NUM`: 并行运行的组数
 
-### 4. 项目结构
+---
 
-建议的目录结构如下：
+## 🎬 Manim 示例
+
+### 包含 DIC JUMPING 片尾的复杂示例
+
+我们创建了一个全面的 Manim 示例（`complex_example.py`），展示了：
+
+1. **渐变文字** - 彩色标题动画
+2. **数学公式** - LaTeX 渲染（欧拉公式）
+3. **图形变换** - 圆形到正方形的变形
+4. **组合动画** - 多个图形一起旋转
+5. **数轴** - 带移动点的交互式数轴
+6. **函数图像** - 正弦波可视化
+7. **DIC JUMPING 片尾** - 带跳跃字母的自定义片尾
+
+#### 如何运行
+
+```bash
+# 1. 激活虚拟环境
+.\venv\Scripts\Activate.ps1
+
+# 2. 快速预览（低质量，快速）
+manim -ql complex_example.py ComplexExample
+
+# 3. 高质量（1080p, 60fps）
+manim -qh complex_example.py ComplexExample
+
+# 4. 4K 质量（2160p, 60fps）
+manim -qk complex_example.py ComplexExample
 ```
-src/
-│── agent.py
-│── run_agent.sh
-│── run_agent_single.sh
-│── api_config.json
-│── ...
-│
-├── assets/
-│   ├── icons/       # 通过 IconFinder API 下载的视觉素材缓存
-│   └── reference/   # 参考图像
-│
-├── json_files/      # 基于 JSON 的主题列表及元数据
-├── prompts/         # 用于 LLM 调用的提示模板
-├── CASES/           # 生成的案例，按 FOLDER_PREFIX 组织
-│   └── TEST-LIST/   # 示例：多主题生成结果
-│   └── TEST-single/ # 示例：单主题生成结果
+
+#### 输出位置
+
+```
+media/videos/complex_example/[quality]/ComplexExample.mp4
+```
+
+#### DIC JUMPING 片尾特点
+
+片尾包含：
+
+- **字母逐个出现** - 每个字母从上方落下并带有动画
+- **跳跃动画** - 所有字母一起跳跃 3 次
+- **副标题** - "VisualKiwi Project" 在下方显示
+- **闪烁效果** - 12 个黄色点围绕文字
+- **最终淡出** - 平滑的结束过渡
+
+### 简单测试示例
+
+```bash
+# 运行简单测试场景
+manim -ql test_manim.py TestScene
 ```
 
 ---
 
-## 📊 评测 -- MMMC
+## 📂 项目结构
 
-从以下**三个互补的维度**进行评测：
+```
+Code2Video/
+│── src/
+│   ├── agent.py              # 核心智能体实现
+│   ├── run_agent.sh          # 批量生成脚本
+│   ├── run_agent_single.sh   # 单知识点生成脚本
+│   ├── api_config.json       # API 配置
+│   ├── requirements.txt      # Python 依赖
+│   └── ...
+│
+├── assets/
+│   ├── icons/                # IconFinder 下载的视觉资源缓存
+│   └── reference/            # 参考图像
+│
+├── json_files/               # JSON 格式的主题列表和元数据
+├── prompts/                  # LLM 调用的提示模板
+│   ├── stage1.py            # Planner 阶段
+│   ├── stage2.py            # Coder 阶段
+│   ├── stage3.py            # Critic 阶段
+│   └── ...
+│
+├── venv/                     # Python 虚拟环境
+│
+├── media/                    # Manim 输出目录
+│   └── videos/
+│       ├── complex_example/  # 复杂示例视频
+│       └── test_manim/       # 测试场景视频
+│
+├── complex_example.py        # 包含 DIC JUMPING 的复杂示例
+├── test_manim.py            # 简单测试场景
+│
+└── CASES/                    # 生成的案例，按 FOLDER_PREFIX 组织
+    └── VisualKiwi-single/   # 示例单主题生成结果
+```
 
-1. **知识传递 (TeachQuiz)**
-   ```bash
-   python3 eval_TQ.py
-   ```
+---
 
-2. **美学质量 (AES)**
-   ```bash
-   python3 eval_AES.py
-   ```
+## 🏗️ 架构设计
 
-3. **效率指标 (EFF)**
-   * Token 使用量
-   * 执行时间
+### 核心架构
 
-👉 更多数据和评测脚本请见：
-[HuggingFace: MMMC 基准](https://huggingface.co/datasets/YanzheChen/MMMC)
+```
+用户提示 (Kiwi/LLM Agent)
+    ↓
+MCP 服务器 (VisualKiwi)
+    ↓
+多智能体编排系统
+    ├── Planner Agent (故事板规划)
+    ├── Coder Agent (代码生成 - Code2Video)
+    ├── Critic Agent (布局优化)
+    └── Visual Assets Agent (资源管理)
+    ↓
+视觉组件生成
+    ├── Code2Video (Manim 视频)
+    ├── Remotion (视频编辑)
+    ├── 交互式 Canvas (React/Web)
+    └── 富内容 Slides
+    ↓
+渲染与展示
+    └── iframe/Web 组件嵌入对话界面
+```
+
+### 模块化设计
+
+VisualKiwi 采用**模块化架构**，可以轻松集成到任何支持 MCP 协议的 LLM 平台：
+
+- **MCP 服务器**：作为核心接口，接收用户提示并返回视觉组件
+
+- **Code2Video 集成**：专门处理算法、数学、物理等需要动画演示的场景
+
+- **可扩展性**：不同内容类型（视频、幻灯片、交互式图表）由不同的智能体处理
+
+---
+
+## 💡 使用案例
+
+### 案例 1：交互式 AVL 树学习
+
+**学生提示**:
+> "我总是搞混 AVL 旋转（LL/RR/LR/RL）。你能用视频教我，同时让我自己操作节点来观察平衡因子的变化吗？"
+
+**VisualKiwi 输出**:
+
+1. **生成的演示视频**（分步、可暂停）
+   - 从插入序列构建 AVL 树（如 10 → 20 → 30 → 25 → 28）
+   - 每一步显示：节点高度、平衡因子、第一个不平衡的祖先节点
+   - 显示触发的旋转类型（LL/RR/LR/RL），包含前后快照
+   - 旁白解释"为什么"：哪个子树变重了，为什么需要特定旋转
+
+2. **交互式前端**（AVL 编辑器）
+   - 画布：可拖拽的树节点和边（学生可以交换/重新连接节点）
+   - 侧边栏：每个节点的实时高度和平衡因子；高亮显示规则违反
+   - 控制：插入、删除、单步、自动旋转、提示、重置、生成新序列
+   - 验证：即时检查 BST 排序和 AVL 平衡约束
+
+**关键交互**:
+- 学生可以故意将树拖到不平衡状态；UI 高亮显示问题节点并建议候选旋转
+- 学生手动选择旋转；系统验证正确性并解释错误
+- "假设"模式：改变插入顺序或删除节点，观察旋转策略的变化
+
+### 案例 2：交互式化学滴定实验
+
+**学生提示**:
+> "我不理解为什么强酸和弱酸的滴定曲线看起来不同。我能交互式地探索它并看到等当点吗？"
+
+**VisualKiwi 输出**:
+
+- **实验控制面板**:
+  - 选择系统：强酸-强碱 / 弱酸-强碱 / 弱酸-弱碱
+  - 参数：初始浓度、体积、Ka/Kb（可选温度）
+  - 操作：控制添加滴定剂体积的滑块（像转动滴定管）
+
+- **实时可视化**:
+  - 动态 pH vs 体积曲线
+  - 物种组成视图（HA/A⁻, H⁺/OH⁻ 比例）
+  - 缓冲区和等当点的自动标记
+  - 解释触发器：跨越关键区域（缓冲 → 等当 → 过量碱）时弹出简洁的化学解释
+
+**关键交互**:
+- 调整 Ka 并立即看到缓冲区域宽度和等当点 pH 偏移
+- "指示剂模式"：选择指示剂；UI 显示其颜色变化范围是否匹配等当点
+
+---
+
+## 🔧 集成到 VisualKiwi MCP 服务器
+
+### MCP 服务器接口设计
+
+VisualKiwi 作为 MCP 服务器，接收用户提示并返回视觉组件：
+
+```python
+# 伪代码示例
+def visualkiwi_mcp_tool(user_prompt: str) -> Dict:
+    """
+    根据用户提示生成视觉组件
+    
+    返回格式：
+    {
+        "type": "video" | "interactive" | "slides",
+        "content": "...",
+        "metadata": {...}
+    }
+    """
+    # 1. 分析用户意图
+    intent = analyze_intent(user_prompt)
+    
+    # 2. 选择合适的生成器
+    if intent.needs_video:
+        # 使用 Code2Video
+        video = code2video.generate(intent.knowledge_point)
+        return {
+            "type": "video",
+            "content": video.embed_url,
+            "metadata": {
+                "duration": video.duration,
+                "manim_code": video.code,
+                "interactive": False
+            }
+        }
+    elif intent.needs_interactive:
+        # 使用交互式 Canvas
+        canvas = generate_interactive_canvas(intent)
+        return {
+            "type": "interactive",
+            "content": canvas.component,
+            "metadata": {...}
+        }
+    # ...
+```
+
+### 前端渲染
+
+在聊天界面中，根据返回的类型渲染不同的组件：
+
+```html
+<!-- 视频组件 -->
+<iframe 
+    src="generated_video.html" 
+    width="100%" 
+    height="600px"
+    allowfullscreen>
+</iframe>
+
+<!-- 交互式 Canvas -->
+<div id="interactive-canvas">
+    <!-- React/Web 组件 -->
+</div>
+
+<!-- 富内容幻灯片 -->
+<div class="slides-container">
+    <!-- Reveal.js 或其他幻灯片框架 -->
+</div>
+```
+
+---
+
+## 📊 技术栈
+
+### 视频生成
+- **Code2Video**: 基于 Manim 的教学视频生成框架
+- **Remotion**: React 视频编辑和合成
+- **Manim Community v0.19.0**: 数学动画引擎（✅ 已安装并验证）
+
+### 交互式可视化
+- **React**: 前端框架
+- **AG-UI / 自定义协议**: UI 组件系统
+- **Mermaid**: 图表和流程图
+- **Reveal.js**: 幻灯片框架
+
+### 多智能体系统
+- **LangGraph**: 智能体编排
+- **Instructor**: 结构化输出
+- **RAG**: 检索增强生成
+
+### 图形和渲染
+- **React D3 Tree**: 树形可视化
+- **Excalidraw**: 绘图和反馈
+- **XYFlow**: 流程图和节点图
+
+---
+
+## 🎯 开发路线图
+
+### 阶段 1：Code2Video 集成（✅ 已完成）
+- [x] 集成 Code2Video 核心功能
+- [x] 配置 API 和依赖
+- [x] 环境设置（Python, FFmpeg, LaTeX）
+- [x] Manim 验证和示例
+- [ ] 创建 MCP 服务器接口
+- [ ] 实现视频生成 API
+
+### 阶段 2：交互式组件
+- [ ] 开发交互式 Canvas 组件
+- [ ] 实现 AVL 树编辑器
+- [ ] 实现化学实验模拟器
+- [ ] 集成 React 前端
+
+### 阶段 3：多智能体编排
+- [ ] 实现 Planner Agent
+- [ ] 实现 Coder Agent（基于 Code2Video）
+- [ ] 实现 Critic Agent
+- [ ] 实现资源管理 Agent
+
+### 阶段 4：MCP 服务器
+- [ ] 实现 MCP 协议接口
+- [ ] 集成到 Kiwi 平台
+- [ ] 测试和优化
+
+---
+
+## 🛠️ 故障排除
+
+### 常见问题
+
+1. **Manim 渲染失败**
+   - 检查 FFmpeg 安装：`ffmpeg -version`
+   - 验证 LaTeX：`latex --version`
+   - 检查 OpenGL 驱动
+
+2. **API 调用失败**
+   - 验证 `src/api_config.json` 中的 API 密钥
+   - 检查网络连接
+   - 查看 API 配额限制
+
+3. **内存问题**
+   - 减少并行处理：调整 `PARALLEL_GROUP_NUM`
+   - 增加系统内存
+   - 优化视频分辨率
+
+4. **依赖安装失败**
+   - 使用国内镜像源（清华、阿里云）
+   - 升级 pip 和 setuptools
+   - 检查 Python 版本兼容性（3.11+）
+
+---
+
+## 🤝 贡献指南
+
+欢迎贡献！请遵循以下步骤：
+
+1. Fork 本仓库
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+---
+
+## 📌 相关资源
+
+### 视频生成框架
+- [Code2Video](https://showlab.github.io/Code2Video/) - 本项目基于的核心框架
+- [Remotion](https://www.remotion.dev/) - React 视频编辑
+- [Generate Explanation Videos](https://arxiv.org/html/2502.19400v1) - 相关研究
+
+### UI 协议
+- [JSON Render](https://github.com/vercel-labs/json-render)
+- [Tambo](https://github.com/tambo-ai/tambo)
+
+### 智能体框架
+- [Instructor](https://github.com/567-labs/instructor)
+- [LangGraph](https://github.com/langchain-ai/langgraph)
+
+### 图表和可视化
+- [XYFlow](https://github.com/xyflow/xyflow)
+- [Excalidraw](https://github.com/excalidraw/excalidraw)
+- [React D3 Tree](https://github.com/bkrem/react-d3-tree)
+- [Mermaid](https://github.com/mermaid-js/mermaid)
+- [Reveal.js](https://github.com/hakimel/reveal.js)
 
 ---
 
 ## 🙏 致谢
 
-* 视频数据来源于 **[3Blue1Brown 官方课程](https://www.3blue1brown.com/#lessons)**。
-  这些视频代表了教学视频在清晰度和美学设计上的最高标准，并为我们的评测指标提供了参考。
-* 感谢 **Show Lab @ NUS** 所有成员的支持！
-* 本项目得益于 **Manim 社区**和 AI 研究生态系统的开源贡献。
-* 高质量的视觉素材（图标）由 **[IconFinder](https://www.iconfinder.com/)** 和 **[Icons8](https://icons8.com/icons)** 提供，用于丰富教学视频内容。
+- **Code2Video 团队**：提供了优秀的代码驱动视频生成框架
+- **Manim Community**：强大的数学动画引擎
+- **3Blue1Brown**：启发了教学视频的设计理念
+- **Show Lab @ NUS**：Code2Video 的原始开发团队
 
 ---
 
-## 📌 引用
+## 📄 许可证
 
-如果我们的工作对您有帮助，欢迎引用我们的工作：
+本项目基于 Code2Video 项目，请参考原始项目的 LICENSE 文件。
 
-```bibtex
-@misc{code2video,
-      title={Code2Video: A Code-centric Paradigm for Educational Video Generation},
-      author={Yanzhe Chen and Kevin Qinghong Lin and Mike Zheng Shou},
-      year={2025},
-      eprint={2510.01174},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={[https://arxiv.org/abs/2510.01174](https://arxiv.org/abs/2510.01174)},
-}
-```
+---
 
-如果您喜欢我们的项目，欢迎在 GitHub 上给我们一个 Star ⭐ 以获取最新动态！
-[![Star History Chart](https://api.star-history.com/svg?repos=showlab/Code2Video&type=Date)](https://star-history.com/#showlab/Code2Video&Date)
+## 📧 联系方式
+
+如有问题或建议，请通过以下方式联系：
+
+- 提交 Issue
+- 开启 Pull Request
+
+---
+
+<p align="center">
+  <b>让学习变得可视化、交互式和有趣！</b>
+</p>
