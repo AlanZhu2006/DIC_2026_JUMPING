@@ -87,7 +87,7 @@ class TeachingVideoAgent:
         self.assets_dir.mkdir(exist_ok=True)
 
         """3. ScopeRefine & Anchor Visual"""
-        self.scope_refine_fixer = ScopeRefineFixer(api, self.max_code_token_length)
+        self.scope_refine_fixer = ScopeRefineFixer(self.API, self.max_code_token_length)
         self.extractor = GridPositionExtractor()
 
         """4. External Database"""

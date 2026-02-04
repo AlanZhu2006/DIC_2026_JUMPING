@@ -27,6 +27,8 @@ def generate_log_id():
 def request_claude(prompt, log_id=None, max_tokens=16384, max_retries=3):
     base_url = cfg("claude", "base_url")
     api_key = cfg("claude", "api_key")
+    # Try to get model from config, fallback to default
+    model_name = cfg("claude", "model", "claude-3-opus")
     client = OpenAI(base_url=base_url, api_key=api_key)
 
     if log_id is None:
@@ -38,7 +40,7 @@ def request_claude(prompt, log_id=None, max_tokens=16384, max_retries=3):
     while retry_count < max_retries:
         try:
             response = client.chat.completions.create(
-                model="claude-4-opus",
+                model=model_name,
                 messages=[
                     {
                         "role": "user",
@@ -72,6 +74,8 @@ def request_claude(prompt, log_id=None, max_tokens=16384, max_retries=3):
 def request_claude_token(prompt, log_id=None, max_tokens=10000, max_retries=3):
     base_url = cfg("claude", "base_url")
     api_key = cfg("claude", "api_key")
+    # Try to get model from config, fallback to default
+    model_name = cfg("claude", "model", "claude-3-opus")
     client = OpenAI(base_url=base_url, api_key=api_key)
 
     if log_id is None:
@@ -84,7 +88,7 @@ def request_claude_token(prompt, log_id=None, max_tokens=10000, max_retries=3):
     while retry_count < max_retries:
         try:
             completion = client.chat.completions.create(
-                model="claude-4-opus",
+                model=model_name,
                 messages=[
                     {
                         "role": "user",
@@ -924,11 +928,15 @@ def request_gpt41_token(prompt, log_id=None, max_tokens=1000, max_retries=3):
     ak = cfg("gpt41", "api_key")
     model_name = cfg("gpt41", "model")
 
-    client = openai.AzureOpenAI(
-        azure_endpoint=base_url,
-        api_version=api_version,
-        api_key=ak,
-    )
+    # Use standard OpenAI client for ChatAnywhere, AzureOpenAI for Azure endpoints
+    if "chatanywhere" in base_url.lower() or "api.chatanywhere" in base_url.lower():
+        client = OpenAI(base_url=base_url, api_key=ak)
+    else:
+        client = openai.AzureOpenAI(
+            azure_endpoint=base_url,
+            api_version=api_version,
+            api_key=ak,
+        )
 
     if log_id is None:
         log_id = generate_log_id()

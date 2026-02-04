@@ -144,7 +144,7 @@ class ComplexExample(Scene):
             FadeOut(VGroup(title, formula, circle, square, shapes, number_line, dot, axes, graph)),
             run_time=2
         )
-        self.wait(0.5)
+        self.wait(0.2)
         
         # 13. DIC JUMPING End Credits - 片尾动画
         # Clear everything first
@@ -184,7 +184,7 @@ class ComplexExample(Scene):
             letter.shift(UP * 2)  # Start above
             self.play(
                 letter.animate.shift(DOWN * 2),
-                run_time=0.3
+                run_time=0.2
             )
         
         self.wait(0.2)
@@ -195,10 +195,10 @@ class ComplexExample(Scene):
             letter.shift(UP * 2)  # Start above
             self.play(
                 letter.animate.shift(DOWN * 2),
-                run_time=0.3
+                run_time=0.2
             )
         
-        self.wait(0.5)
+        self.wait(0.2)
         
         # Make all letters jump together
         # 让所有字母一起跳跃
