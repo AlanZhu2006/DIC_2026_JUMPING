@@ -302,9 +302,11 @@ media/videos/complex_example/[quality]/ComplexExample.mp4
 #### 视频预览
 
 <video width="800" controls>
-  <source src="assets/videos/examples/ComplexExample.mp4" type="video/mp4">
+  <source src="https://raw.githubusercontent.com/AlanZhu2006/DIC_2026_JUMPING/main/assets/videos/examples/ComplexExample.mp4" type="video/mp4">
   您的浏览器不支持视频标签。
 </video>
+
+*备选方案：[下载视频](assets/videos/examples/ComplexExample.mp4)*
 
 *注意：更高质量的版本请查看 `media/videos/complex_example/1080p60/` 或 `2160p60/` 目录。*
 
@@ -371,9 +373,11 @@ src/CASES/TEST-single_Chatgpt41/0-Circle_area_formula/
 #### 视频预览
 
 <video width="800" controls>
-  <source src="assets/videos/examples/Circle_area_formula.mp4" type="video/mp4">
+  <source src="https://raw.githubusercontent.com/AlanZhu2006/DIC_2026_JUMPING/main/assets/videos/examples/Circle_area_formula.mp4" type="video/mp4">
   您的浏览器不支持视频标签。
 </video>
+
+*备选方案：[下载视频](assets/videos/examples/Circle_area_formula.mp4)*
 
 *此视频由 Code2Video 框架使用 GPT-3.5-turbo API 自动生成。*
 
