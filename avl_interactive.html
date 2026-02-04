@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisualKiwi - Interactive AVL Tree Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Left Panel - Controls */
+        .left-panel {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .logo span {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        input[type="number"], input[type="text"] {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00d9ff, #00ff88);
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 71, 87, 0.3);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn-group button {
+            flex: 1;
+            min-width: calc(50% - 4px);
+        }
+
+        /* Rotation Buttons */
+        .rotation-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .rotation-btn {
+            padding: 12px;
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            color: #ffa500;
+            font-weight: bold;
+        }
+
+        .rotation-btn:hover {
+            background: rgba(255, 165, 0, 0.2);
+        }
+
+        .rotation-btn.active {
+            background: rgba(255, 165, 0, 0.3);
+            border-color: #ffa500;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .mode-toggle button {
+            flex: 1;
+            padding: 8px;
+            background: transparent;
+            color: #888;
+            border-radius: 6px;
+        }
+
+        .mode-toggle button.active {
+            background: linear-gradient(45deg, #00d9ff, #00ff88);
+            color: #1a1a2e;
+        }
+
+        /* Main Canvas Area */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-balanced {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .status-unbalanced {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #treeCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        #treeCanvas:active {
+            cursor: grabbing;
+        }
+
+        /* Right Panel - Info */
+        .right-panel {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-card h3 {
+            font-size: 14px;
+            color: #00d9ff;
+            margin-bottom: 10px;
+        }
+
+        .node-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .node-info-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .node-info-item .label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .node-info-item .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .node-info-item .value.negative {
+            color: #ff4757;
+        }
+
+        .node-info-item .value.positive {
+            color: #00ff88;
+        }
+
+        /* Node List */
+        .node-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .node-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .node-list-item.unbalanced {
+            border-left: 3px solid #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+        }
+
+        .node-list-item .node-value {
+            font-weight: bold;
+        }
+
+        .node-list-item .node-bf {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .bf-ok {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .bf-bad {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+
+        /* Message Log */
+        .message-log {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            padding-left: 10px;
+            border-left: 2px solid #00d9ff;
+        }
+
+        .log-entry.warning {
+            border-left-color: #ffa500;
+            color: #ffa500;
+        }
+
+        .log-entry.error {
+            border-left-color: #ff4757;
+            color: #ff4757;
+        }
+
+        .log-entry.success {
+            border-left-color: #00ff88;
+            color: #00ff88;
+        }
+
+        /* Animation Controls */
+        .playback-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .playback-controls button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .speed-control input[type="range"] {
+            width: 80px;
+        }
+
+        /* Tutorial Overlay */
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .tutorial-overlay.hidden {
+            display: none;
+        }
+
+        .tutorial-card {
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tutorial-card h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tutorial-card p {
+            color: #aaa;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* Hint Popup */
+        .hint-popup {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #ffa500, #ff6b35);
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(255, 165, 0, 0.4);
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        .hint-popup.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+            pointer-events: none;
+        }
+
+        /* Sequence Display */
+        .sequence-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .sequence-item {
+            padding: 4px 10px;
+            background: rgba(0, 217, 255, 0.2);
+            border-radius: 4px;
+            font-size: 12px;
+            color: #00d9ff;
+        }
+
+        .sequence-item.current {
+            background: #00d9ff;
+            color: #1a1a2e;
+        }
+
+        .sequence-item.done {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="logo">
+                <span>🥝 VisualKiwi</span>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Mode</div>
+                <div class="mode-toggle">
+                    <button class="active" onclick="setMode('learn')">📚 Learn</button>
+                    <button onclick="setMode('practice')">✋ Practice</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Insert Node</div>
+                <div class="input-group">
+                    <input type="number" id="insertValue" placeholder="Value" min="1" max="999">
+                    <button class="btn-primary" onclick="insertNode()">Insert</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Delete Node</div>
+                <div class="input-group">
+                    <input type="number" id="deleteValue" placeholder="Value">
+                    <button class="btn-danger" onclick="deleteNode()">Delete</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Sequence Builder</div>
+                <div class="input-group">
+                    <input type="text" id="sequenceInput" placeholder="e.g., 10,20,30,25,28">
+                </div>
+                <div class="btn-group">
+                    <button class="btn-secondary" onclick="loadSequence()">Load</button>
+                    <button class="btn-secondary" onclick="generateRandomSequence()">Random</button>
+                </div>
+                <div class="sequence-display" id="sequenceDisplay"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Manual Rotations</div>
+                <div class="rotation-btns">
+                    <button class="rotation-btn" onclick="applyRotation('LL')">LL ↻</button>
+                    <button class="rotation-btn" onclick="applyRotation('RR')">RR ↺</button>
+                    <button class="rotation-btn" onclick="applyRotation('LR')">LR ↻↺</button>
+                    <button class="rotation-btn" onclick="applyRotation('RL')">RL ↺↻</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Playback</div>
+                <div class="btn-group">
+                    <button class="btn-secondary" onclick="stepBack()">⏮ Back</button>
+                    <button class="btn-secondary" onclick="stepForward()">Next ⏭</button>
+                </div>
+                <div class="btn-group" style="margin-top: 8px;">
+                    <button class="btn-secondary" onclick="autoPlay()">▶ Auto</button>
+                    <button class="btn-secondary" onclick="pausePlay()">⏸ Pause</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Actions</div>
+                <div class="btn-group">
+                    <button class="btn-secondary" onclick="showHint()">💡 Hint</button>
+                    <button class="btn-secondary" onclick="autoBalance()">⚖️ Auto-Fix</button>
+                </div>
+                <div class="btn-group" style="margin-top: 8px;">
+                    <button class="btn-danger" onclick="resetTree()">🔄 Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Canvas -->
+        <div class="main-area">
+            <div class="toolbar">
+                <div class="playback-controls">
+                    <span>Speed:</span>
+                    <input type="range" id="speedSlider" min="0.5" max="3" step="0.5" value="1" onchange="updateSpeed()">
+                    <span id="speedValue">1x</span>
+                </div>
+                <div>
+                    <span id="statusBadge" class="status-badge status-balanced">✓ Balanced</span>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="treeCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <div class="info-card">
+                <h3>📊 Selected Node</h3>
+                <div class="node-info-grid">
+                    <div class="node-info-item">
+                        <div class="label">Value</div>
+                        <div class="value" id="selectedValue">-</div>
+                    </div>
+                    <div class="node-info-item">
+                        <div class="label">Height</div>
+                        <div class="value" id="selectedHeight">-</div>
+                    </div>
+                    <div class="node-info-item">
+                        <div class="label">Balance</div>
+                        <div class="value" id="selectedBalance">-</div>
+                    </div>
+                    <div class="node-info-item">
+                        <div class="label">Depth</div>
+                        <div class="value" id="selectedDepth">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>🌳 All Nodes</h3>
+                <div class="node-list" id="nodeList">
+                    <div style="color: #666; text-align: center; padding: 20px;">
+                        Insert nodes to begin
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>📝 Activity Log</h3>
+                <div class="message-log" id="messageLog">
+                    <div class="log-entry">Welcome to VisualKiwi AVL Trainer!</div>
+                    <div class="log-entry">Try inserting: 10 → 20 → 30</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>🎓 Rotation Guide</h3>
+                <div style="font-size: 12px; line-height: 1.8; color: #aaa;">
+                    <p><b style="color:#ffa500">LL:</b> Left-Left case → Right rotation</p>
+                    <p><b style="color:#ffa500">RR:</b> Right-Right case → Left rotation</p>
+                    <p><b style="color:#ffa500">LR:</b> Left-Right case → Left then Right</p>
+                    <p><b style="color:#ffa500">RL:</b> Right-Left case → Right then Left</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hint Popup -->
+    <div class="hint-popup hidden" id="hintPopup">
+        💡 <span id="hintText">Hint will appear here</span>
+    </div>
+
+    <!-- Tutorial Overlay -->
+    <div class="tutorial-overlay hidden" id="tutorialOverlay">
+        <div class="tutorial-card">
+            <h2>Welcome to VisualKiwi!</h2>
+            <p>
+                Learn AVL tree rotations interactively. Insert nodes, watch balance factors change, 
+                and understand when LL, RR, LR, or RL rotations are needed.
+            </p>
+            <p>
+                <b>Try this sequence:</b> 10 → 20 → 30<br>
+                Watch what happens when the tree becomes unbalanced!
+            </p>
+            <button class="btn-primary" onclick="closeTutorial()">Let's Start! 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== AVL Tree Implementation ====================
+        class AVLNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+                this.height = 1;
+                this.x = 0;
+                this.y = 0;
+                this.targetX = 0;
+                this.targetY = 0;
+            }
+        }
+
+        class AVLTree {
+            constructor() {
+                this.root = null;
+                this.history = [];
+                this.historyIndex = -1;
+            }
+
+            getHeight(node) {
+                return node ? node.height : 0;
+            }
+
+            getBalance(node) {
+                return node ? this.getHeight(node.left) - this.getHeight(node.right) : 0;
+            }
+
+            updateHeight(node) {
+                if (node) {
+                    node.height = 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right));
+                }
+            }
+
+            // Right rotation (LL case)
+            rightRotate(y) {
+                const x = y.left;
+                const T2 = x.right;
+
+                x.right = y;
+                y.left = T2;
+
+                this.updateHeight(y);
+                this.updateHeight(x);
+
+                return x;
+            }
+
+            // Left rotation (RR case)
+            leftRotate(x) {
+                const y = x.right;
+                const T2 = y.left;
+
+                y.left = x;
+                x.right = T2;
+
+                this.updateHeight(x);
+                this.updateHeight(y);
+
+                return y;
+            }
+
+            insert(value, autoBalance = true) {
+                this.saveState();
+                this.root = this._insert(this.root, value, autoBalance);
+                return this.root;
+            }
+
+            _insert(node, value, autoBalance) {
+                if (!node) {
+                    return new AVLNode(value);
+                }
+
+                if (value < node.value) {
+                    node.left = this._insert(node.left, value, autoBalance);
+                } else if (value > node.value) {
+                    node.right = this._insert(node.right, value, autoBalance);
+                } else {
+                    return node; // Duplicate values not allowed
+                }
+
+                this.updateHeight(node);
+
+                if (!autoBalance) {
+                    return node;
+                }
+
+                const balance = this.getBalance(node);
+
+                // LL Case
+                if (balance > 1 && value < node.left.value) {
+                    addLog('LL rotation needed at node ' + node.value, 'warning');
+                    return this.rightRotate(node);
+                }
+
+                // RR Case
+                if (balance < -1 && value > node.right.value) {
+                    addLog('RR rotation needed at node ' + node.value, 'warning');
+                    return this.leftRotate(node);
+                }
+
+                // LR Case
+                if (balance > 1 && value > node.left.value) {
+                    addLog('LR rotation needed at node ' + node.value, 'warning');
+                    node.left = this.leftRotate(node.left);
+                    return this.rightRotate(node);
+                }
+
+                // RL Case
+                if (balance < -1 && value < node.right.value) {
+                    addLog('RL rotation needed at node ' + node.value, 'warning');
+                    node.right = this.rightRotate(node.right);
+                    return this.leftRotate(node);
+                }
+
+                return node;
+            }
+
+            delete(value) {
+                this.saveState();
+                this.root = this._delete(this.root, value);
+                return this.root;
+            }
+
+            _delete(node, value) {
+                if (!node) return node;
+
+                if (value < node.value) {
+                    node.left = this._delete(node.left, value);
+                } else if (value > node.value) {
+                    node.right = this._delete(node.right, value);
+                } else {
+                    if (!node.left || !node.right) {
+                        node = node.left || node.right;
+                    } else {
+                        let temp = this._minValueNode(node.right);
+                        node.value = temp.value;
+                        node.right = this._delete(node.right, temp.value);
+                    }
+                }
+
+                if (!node) return node;
+
+                this.updateHeight(node);
+                const balance = this.getBalance(node);
+
+                // LL Case
+                if (balance > 1 && this.getBalance(node.left) >= 0) {
+                    return this.rightRotate(node);
+                }
+
+                // LR Case
+                if (balance > 1 && this.getBalance(node.left) < 0) {
+                    node.left = this.leftRotate(node.left);
+                    return this.rightRotate(node);
+                }
+
+                // RR Case
+                if (balance < -1 && this.getBalance(node.right) <= 0) {
+                    return this.leftRotate(node);
+                }
+
+                // RL Case
+                if (balance < -1 && this.getBalance(node.right) > 0) {
+                    node.right = this.rightRotate(node.right);
+                    return this.leftRotate(node);
+                }
+
+                return node;
+            }
+
+            _minValueNode(node) {
+                let current = node;
+                while (current.left) {
+                    current = current.left;
+                }
+                return current;
+            }
+
+            saveState() {
+                const state = this.cloneTree(this.root);
+                this.history = this.history.slice(0, this.historyIndex + 1);
+                this.history.push(state);
+                this.historyIndex++;
+            }
+
+            cloneTree(node) {
+                if (!node) return null;
+                const clone = new AVLNode(node.value);
+                clone.height = node.height;
+                clone.left = this.cloneTree(node.left);
+                clone.right = this.cloneTree(node.right);
+                return clone;
+            }
+
+            undo() {
+                if (this.historyIndex > 0) {
+                    this.historyIndex--;
+                    this.root = this.cloneTree(this.history[this.historyIndex]);
+                    return true;
+                }
+                return false;
+            }
+
+            redo() {
+                if (this.historyIndex < this.history.length - 1) {
+                    this.historyIndex++;
+                    this.root = this.cloneTree(this.history[this.historyIndex]);
+                    return true;
+                }
+                return false;
+            }
+
+            findUnbalanced() {
+                const unbalanced = [];
+                this._findUnbalanced(this.root, unbalanced);
+                return unbalanced;
+            }
+
+            _findUnbalanced(node, result) {
+                if (!node) return;
+                const balance = this.getBalance(node);
+                if (Math.abs(balance) > 1) {
+                    result.push({ node, balance });
+                }
+                this._findUnbalanced(node.left, result);
+                this._findUnbalanced(node.right, result);
+            }
+
+            detectRotationType(node) {
+                const balance = this.getBalance(node);
+                if (balance > 1) {
+                    if (this.getBalance(node.left) >= 0) return 'LL';
+                    return 'LR';
+                }
+                if (balance < -1) {
+                    if (this.getBalance(node.right) <= 0) return 'RR';
+                    return 'RL';
+                }
+                return null;
+            }
+
+            getAllNodes() {
+                const nodes = [];
+                this._inorder(this.root, nodes, 0);
+                return nodes;
+            }
+
+            _inorder(node, result, depth) {
+                if (!node) return;
+                this._inorder(node.left, result, depth + 1);
+                result.push({
+                    value: node.value,
+                    height: node.height,
+                    balance: this.getBalance(node),
+                    depth: depth
+                });
+                this._inorder(node.right, result, depth + 1);
+            }
+        }
+
+        // ==================== Canvas Rendering ====================
+        const canvas = document.getElementById('treeCanvas');
+        const ctx = canvas.getContext('2d');
+        let tree = new AVLTree();
+        let selectedNode = null;
+        let animationSpeed = 1;
+        let currentMode = 'learn';
+        let sequence = [];
+        let sequenceIndex = 0;
+        let isAutoPlaying = false;
+        let autoPlayInterval = null;
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            render();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function calculatePositions(node, x, y, level, spacing) {
+            if (!node) return;
+            
+            node.targetX = x;
+            node.targetY = y;
+            
+            if (node.x === 0 && node.y === 0) {
+                node.x = x;
+                node.y = y;
+            }
+
+            const nextSpacing = spacing * 0.6;
+            const verticalGap = 70;
+
+            if (node.left) {
+                calculatePositions(node.left, x - spacing, y + verticalGap, level + 1, nextSpacing);
+            }
+            if (node.right) {
+                calculatePositions(node.right, x + spacing, y + verticalGap, level + 1, nextSpacing);
+            }
+        }
+
+        function animatePositions(node) {
+            if (!node) return false;
+            
+            let moved = false;
+            const speed = 0.15;
+
+            if (Math.abs(node.x - node.targetX) > 0.5 || Math.abs(node.y - node.targetY) > 0.5) {
+                node.x += (node.targetX - node.x) * speed;
+                node.y += (node.targetY - node.y) * speed;
+                moved = true;
+            }
+
+            if (animatePositions(node.left)) moved = true;
+            if (animatePositions(node.right)) moved = true;
+
+            return moved;
+        }
+
+        function drawEdge(parent, child) {
+            ctx.beginPath();
+            ctx.moveTo(parent.x, parent.y);
+            ctx.lineTo(child.x, child.y);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawNode(node, isUnbalanced = false, isSelected = false) {
+            const balance = tree.getBalance(node);
+            const radius = 28;
+
+            // Node circle
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+            
+            if (isSelected) {
+                ctx.fillStyle = '#00d9ff';
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 3;
+            } else if (isUnbalanced) {
+                ctx.fillStyle = 'rgba(255, 71, 87, 0.8)';
+                ctx.strokeStyle = '#ff4757';
+                ctx.lineWidth = 3;
+            } else {
+                ctx.fillStyle = 'rgba(100, 100, 150, 0.8)';
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 2;
+            }
+            
+            ctx.fill();
+            ctx.stroke();
+
+            // Node value
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 16px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(node.value, node.x, node.y);
+
+            // Balance factor badge
+            const bfX = node.x + radius - 5;
+            const bfY = node.y - radius + 5;
+            
+            ctx.beginPath();
+            ctx.arc(bfX, bfY, 12, 0, Math.PI * 2);
+            ctx.fillStyle = Math.abs(balance) > 1 ? '#ff4757' : 
+                           balance > 0 ? '#00ff88' : 
+                           balance < 0 ? '#ffa500' : '#888';
+            ctx.fill();
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px Segoe UI';
+            ctx.fillText(balance > 0 ? '+' + balance : balance.toString(), bfX, bfY);
+
+            // Height indicator
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.font = '10px Segoe UI';
+            ctx.fillText('h=' + node.height, node.x, node.y + radius + 15);
+        }
+
+        function drawTree(node) {
+            if (!node) return;
+
+            // Draw edges first
+            if (node.left) {
+                drawEdge(node, node.left);
+                drawTree(node.left);
+            }
+            if (node.right) {
+                drawEdge(node, node.right);
+                drawTree(node.right);
+            }
+        }
+
+        function drawNodes(node) {
+            if (!node) return;
+
+            const unbalanced = tree.findUnbalanced();
+            const isUnbalanced = unbalanced.some(u => u.node.value === node.value);
+            const isSelected = selectedNode && selectedNode.value === node.value;
+
+            drawNode(node, isUnbalanced, isSelected);
+
+            if (node.left) drawNodes(node.left);
+            if (node.right) drawNodes(node.right);
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!tree.root) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.font = '18px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText('Insert nodes to build your AVL tree', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            calculatePositions(tree.root, canvas.width / 2, 80, 0, canvas.width / 4);
+            
+            const stillAnimating = animatePositions(tree.root);
+            
+            drawTree(tree.root);
+            drawNodes(tree.root);
+
+            if (stillAnimating) {
+                requestAnimationFrame(render);
+            }
+        }
+
+        // ==================== UI Functions ====================
+        function insertNode() {
+            const input = document.getElementById('insertValue');
+            const value = parseInt(input.value);
+            
+            if (isNaN(value)) {
+                addLog('Please enter a valid number', 'error');
+                return;
+            }
+
+            const autoBalance = currentMode === 'learn';
+            tree.insert(value, autoBalance);
+            addLog(`Inserted node ${value}`, 'success');
+            
+            input.value = '';
+            updateUI();
+            render();
+        }
+
+        function deleteNode() {
+            const input = document.getElementById('deleteValue');
+            const value = parseInt(input.value);
+            
+            if (isNaN(value)) {
+                addLog('Please enter a valid number', 'error');
+                return;
+            }
+
+            tree.delete(value);
+            addLog(`Deleted node ${value}`, 'success');
+            
+            input.value = '';
+            updateUI();
+            render();
+        }
+
+        function loadSequence() {
+            const input = document.getElementById('sequenceInput').value;
+            sequence = input.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+            sequenceIndex = 0;
+            updateSequenceDisplay();
+            addLog(`Loaded sequence: ${sequence.join(' → ')}`, 'info');
+        }
+
+        function generateRandomSequence() {
+            sequence = [];
+            const count = 5 + Math.floor(Math.random() * 4);
+            const used = new Set();
+            
+            while (sequence.length < count) {
+                const val = Math.floor(Math.random() * 50) + 1;
+                if (!used.has(val)) {
+                    used.add(val);
+                    sequence.push(val);
+                }
+            }
+            
+            sequenceIndex = 0;
+            document.getElementById('sequenceInput').value = sequence.join(',');
+            updateSequenceDisplay();
+            addLog(`Generated random sequence: ${sequence.join(' → ')}`, 'info');
+        }
+
+        function updateSequenceDisplay() {
+            const display = document.getElementById('sequenceDisplay');
+            display.innerHTML = sequence.map((val, i) => {
+                let cls = 'sequence-item';
+                if (i < sequenceIndex) cls += ' done';
+                if (i === sequenceIndex) cls += ' current';
+                return `<span class="${cls}">${val}</span>`;
+            }).join('');
+        }
+
+        function stepForward() {
+            if (sequenceIndex < sequence.length) {
+                const value = sequence[sequenceIndex];
+                const autoBalance = currentMode === 'learn';
+                tree.insert(value, autoBalance);
+                addLog(`Step: Inserted ${value}`, 'success');
+                sequenceIndex++;
+                updateSequenceDisplay();
+                updateUI();
+                render();
+            } else {
+                addLog('Sequence complete!', 'info');
+            }
+        }
+
+        function stepBack() {
+            if (tree.undo()) {
+                if (sequenceIndex > 0) sequenceIndex--;
+                updateSequenceDisplay();
+                updateUI();
+                render();
+                addLog('Stepped back', 'info');
+            }
+        }
+
+        function autoPlay() {
+            if (isAutoPlaying) return;
+            isAutoPlaying = true;
+            
+            const interval = 1500 / animationSpeed;
+            autoPlayInterval = setInterval(() => {
+                if (sequenceIndex < sequence.length) {
+                    stepForward();
+                } else {
+                    pausePlay();
+                }
+            }, interval);
+            
+            addLog('Auto-play started', 'info');
+        }
+
+        function pausePlay() {
+            isAutoPlaying = false;
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+            addLog('Paused', 'info');
+        }
+
+        function applyRotation(type) {
+            const unbalanced = tree.findUnbalanced();
+            
+            if (unbalanced.length === 0) {
+                addLog('Tree is already balanced!', 'info');
+                return;
+            }
+
+            const target = unbalanced[0];
+            const correctType = tree.detectRotationType(target.node);
+
+            if (type === correctType) {
+                // Apply the rotation
+                tree.saveState();
+                
+                // Re-balance the tree
+                const rebalance = (node) => {
+                    if (!node) return null;
+                    
+                    node.left = rebalance(node.left);
+                    node.right = rebalance(node.right);
+                    tree.updateHeight(node);
+                    
+                    const balance = tree.getBalance(node);
+                    
+                    if (balance > 1 && tree.getBalance(node.left) >= 0) {
+                        return tree.rightRotate(node);
+                    }
+                    if (balance > 1 && tree.getBalance(node.left) < 0) {
+                        node.left = tree.leftRotate(node.left);
+                        return tree.rightRotate(node);
+                    }
+                    if (balance < -1 && tree.getBalance(node.right) <= 0) {
+                        return tree.leftRotate(node);
+                    }
+                    if (balance < -1 && tree.getBalance(node.right) > 0) {
+                        node.right = tree.rightRotate(node.right);
+                        return tree.leftRotate(node);
+                    }
+                    
+                    return node;
+                };
+                
+                tree.root = rebalance(tree.root);
+                addLog(`✓ Correct! Applied ${type} rotation`, 'success');
+            } else {
+                addLog(`✗ Wrong! Node ${target.node.value} needs ${correctType}, not ${type}`, 'error');
+                showHintPopup(`Balance factor is ${target.balance}. ${getRotationExplanation(correctType)}`);
+            }
+
+            updateUI();
+            render();
+        }
+
+        function getRotationExplanation(type) {
+            const explanations = {
+                'LL': 'Left subtree is left-heavy → Use Right rotation',
+                'RR': 'Right subtree is right-heavy → Use Left rotation', 
+                'LR': 'Left subtree is right-heavy → Use Left-Right rotation',
+                'RL': 'Right subtree is left-heavy → Use Right-Left rotation'
+            };
+            return explanations[type] || '';
+        }
+
+        function showHint() {
+            const unbalanced = tree.findUnbalanced();
+            
+            if (unbalanced.length === 0) {
+                showHintPopup('Tree is perfectly balanced! Try inserting more nodes.');
+                return;
+            }
+
+            const target = unbalanced[0];
+            const rotationType = tree.detectRotationType(target.node);
+            showHintPopup(`Node ${target.node.value} has BF=${target.balance}. Needs ${rotationType} rotation!`);
+        }
+
+        function showHintPopup(text) {
+            const popup = document.getElementById('hintPopup');
+            document.getElementById('hintText').textContent = text;
+            popup.classList.remove('hidden');
+            
+            setTimeout(() => {
+                popup.classList.add('hidden');
+            }, 4000);
+        }
+
+        function autoBalance() {
+            const rebalance = (node) => {
+                if (!node) return null;
+                
+                node.left = rebalance(node.left);
+                node.right = rebalance(node.right);
+                tree.updateHeight(node);
+                
+                const balance = tree.getBalance(node);
+                
+                if (balance > 1 && tree.getBalance(node.left) >= 0) {
+                    addLog(`Auto: LL rotation at ${node.value}`, 'warning');
+                    return tree.rightRotate(node);
+                }
+                if (balance > 1 && tree.getBalance(node.left) < 0) {
+                    addLog(`Auto: LR rotation at ${node.value}`, 'warning');
+                    node.left = tree.leftRotate(node.left);
+                    return tree.rightRotate(node);
+                }
+                if (balance < -1 && tree.getBalance(node.right) <= 0) {
+                    addLog(`Auto: RR rotation at ${node.value}`, 'warning');
+                    return tree.leftRotate(node);
+                }
+                if (balance < -1 && tree.getBalance(node.right) > 0) {
+                    addLog(`Auto: RL rotation at ${node.value}`, 'warning');
+                    node.right = tree.rightRotate(node.right);
+                    return tree.leftRotate(node);
+                }
+                
+                return node;
+            };
+            
+            tree.saveState();
+            tree.root = rebalance(tree.root);
+            addLog('Tree auto-balanced', 'success');
+            updateUI();
+            render();
+        }
+
+        function resetTree() {
+            tree = new AVLTree();
+            sequenceIndex = 0;
+            selectedNode = null;
+            updateSequenceDisplay();
+            updateUI();
+            render();
+            addLog('Tree reset', 'info');
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-toggle button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            addLog(`Switched to ${mode === 'learn' ? 'Learn (auto-balance)' : 'Practice (manual)'} mode`, 'info');
+        }
+
+        function updateSpeed() {
+            animationSpeed = parseFloat(document.getElementById('speedSlider').value);
+            document.getElementById('speedValue').textContent = animationSpeed + 'x';
+        }
+
+        function updateUI() {
+            // Update status badge
+            const unbalanced = tree.findUnbalanced();
+            const badge = document.getElementById('statusBadge');
+            
+            if (unbalanced.length === 0) {
+                badge.className = 'status-badge status-balanced';
+                badge.textContent = '✓ Balanced';
+            } else {
+                badge.className = 'status-badge status-unbalanced';
+                badge.textContent = `⚠ ${unbalanced.length} unbalanced`;
+            }
+
+            // Update node list
+            const nodes = tree.getAllNodes();
+            const nodeList = document.getElementById('nodeList');
+            
+            if (nodes.length === 0) {
+                nodeList.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">Insert nodes to begin</div>';
+            } else {
+                nodeList.innerHTML = nodes.map(n => {
+                    const isUnbalanced = Math.abs(n.balance) > 1;
+                    return `
+                        <div class="node-list-item ${isUnbalanced ? 'unbalanced' : ''}" onclick="selectNodeByValue(${n.value})">
+                            <span class="node-value">${n.value}</span>
+                            <span>h=${n.height}</span>
+                            <span class="node-bf ${isUnbalanced ? 'bf-bad' : 'bf-ok'}">
+                                BF: ${n.balance > 0 ? '+' : ''}${n.balance}
+                            </span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function selectNodeByValue(value) {
+            const findNode = (node) => {
+                if (!node) return null;
+                if (node.value === value) return node;
+                return findNode(node.left) || findNode(node.right);
+            };
+            
+            selectedNode = findNode(tree.root);
+            
+            if (selectedNode) {
+                document.getElementById('selectedValue').textContent = selectedNode.value;
+                document.getElementById('selectedHeight').textContent = selectedNode.height;
+                
+                const balance = tree.getBalance(selectedNode);
+                const balanceEl = document.getElementById('selectedBalance');
+                balanceEl.textContent = (balance > 0 ? '+' : '') + balance;
+                balanceEl.className = 'value ' + (balance > 0 ? 'positive' : balance < 0 ? 'negative' : '');
+                
+                // Calculate depth
+                let depth = 0;
+                let current = tree.root;
+                while (current && current.value !== value) {
+                    depth++;
+                    current = value < current.value ? current.left : current.right;
+                }
+                document.getElementById('selectedDepth').textContent = depth;
+            }
+            
+            render();
+        }
+
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('messageLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.textContent = message;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+            
+            // Keep only last 20 entries
+            while (log.children.length > 20) {
+                log.removeChild(log.firstChild);
+            }
+        }
+
+        function closeTutorial() {
+            document.getElementById('tutorialOverlay').classList.add('hidden');
+        }
+
+        // Canvas click handler
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const findClickedNode = (node) => {
+                if (!node) return null;
+                const dx = x - node.x;
+                const dy = y - node.y;
+                if (dx * dx + dy * dy <= 28 * 28) {
+                    return node;
+                }
+                return findClickedNode(node.left) || findClickedNode(node.right);
+            };
+
+            const clicked = findClickedNode(tree.root);
+            if (clicked) {
+                selectNodeByValue(clicked.value);
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            
+            switch(e.key) {
+                case 'ArrowRight':
+                    stepForward();
+                    break;
+                case 'ArrowLeft':
+                    stepBack();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    isAutoPlaying ? pausePlay() : autoPlay();
+                    break;
+                case 'h':
+                    showHint();
+                    break;
+                case 'r':
+                    resetTree();
+                    break;
+            }
+        });
+
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
