@@ -68,18 +68,24 @@
 - [x] **阶段 7：功能测试**
   - ✅ 单知识点测试已完成
   - ✅ 视频生成流程已验证
-  - ✅ 测试案例："圆形面积公式" - 成功生成视频
-  - ✅ 成功率：100%（知识点处理），83.3%（视频渲染）
+  - ✅ 多个测试案例已完成（使用不同 API 模型）
+  - ✅ 成功率：100%（知识点处理），100%（使用 GPT-5.2 的视频渲染）
   - ✅ 生成文件：大纲、故事板、Manim 代码和最终视频
 
 ### 测试结果总结
 
-**最新测试** (2026-02-04):
+**最新测试** (2026-02-04) - GPT-5.2:
 - **知识点**: "圆形面积公式"
-- **API**: gpt-41 (ChatAnywhere, gpt-3.5-turbo)
-- **耗时**: 3.46 分钟
-- **输出**: 成功生成 `Circle_area_formula.mp4` (865 KB)
-- **章节**: 生成 6 个章节，5/6 成功渲染 (83.3%)
+- **API**: gpt-5 (官方 OpenAI, gpt-5.2)
+- **耗时**: 4.80 分钟
+- **输出**: 成功生成 `Circle_area_formula.mp4`
+- **章节**: 生成 7 个章节，7/7 成功渲染 (100%)
+- **Token 使用**: 29,222 tokens
+- **质量**: 内容更丰富，章节更详细
+
+**之前的测试**：
+- **GPT-4o 测试**: 5 个章节，100% 成功率，1.99 分钟，13,198 tokens
+- **ChatAnywhere 测试**: 6 个章节，83.3% 成功率，3.46 分钟
 
 ---
 
@@ -138,14 +144,43 @@ Copy-Item api_config.json.template api_config.json
 
 #### 步骤 2：获取 API 密钥
 
-#### 方案 1：ChatAnywhere 免费 API（推荐用于测试）
+#### 方案 1：官方 OpenAI API（推荐用于生产环境）
+
+**官方 OpenAI API** 提供最佳的质量和可靠性。从 [OpenAI Platform](https://platform.openai.com/api-keys) 获取您的 API 密钥。
+
+**步骤**：
+1. 访问 https://platform.openai.com/api-keys
+2. 注册或登录您的 OpenAI 账号
+3. 创建新的 API 密钥
+4. 编辑 `src/api_config.json`，将 `YOUR_OPENAI_API_KEY` 替换为您的实际 API 密钥：
+
+```json
+{
+    "gpt41": {
+        "base_url": "https://api.openai.com/v1",
+        "api_version": "",
+        "api_key": "sk-YOUR_OPENAI_API_KEY",
+        "model": "gpt-4o-mini"
+    },
+    "gpt4o": {
+        "base_url": "https://api.openai.com/v1",
+        "api_version": "",
+        "api_key": "sk-YOUR_OPENAI_API_KEY",
+        "model": "gpt-4o"
+    }
+}
+```
+
+**注意**：官方 OpenAI API 需要付费，但提供最佳的模型质量和可靠性。
+
+#### 方案 2：ChatAnywhere 免费 API（测试备选方案）
 
 [ChatAnywhere](https://github.com/chatanywhere/GPT_API_free) 提供免费的 API 转发服务，支持多种模型。一个 API Key 可用于所有模型！
 
 **步骤**：
 1. 访问 https://github.com/chatanywhere/GPT_API_free
 2. 使用 GitHub 账号登录并获取免费 API Key
-3. 编辑 `src/api_config.json`，将 `YOUR_CHATANYWHERE_API_KEY` 替换为您的实际 API Key：
+3. 编辑 `src/api_config.json`，使用 `gpt41-chatanywhere` 或 `gpt4o-chatanywhere` 配置，将 `YOUR_CHATANYWHERE_API_KEY` 替换为您的实际 API Key：
 
 ```json
 {
@@ -370,14 +405,16 @@ src/CASES/TEST-single_Chatgpt41/0-Circle_area_formula/
 - **渲染成功**: 5/6 个章节（section_5 代码错误，已跳过）
 - **最终输出**: 完整的教学视频，可直接使用
 
-#### 视频预览
+#### 视频预览（GPT-5.2 生成）
 
 <video width="800" controls>
-  <source src="https://raw.githubusercontent.com/AlanZhu2006/DIC_2026_JUMPING/main/assets/videos/examples/Circle_area_formula.mp4" type="video/mp4">
+  <source src="https://raw.githubusercontent.com/AlanZhu2006/DIC_2026_JUMPING/main/assets/videos/examples/Circle_area_formula_gpt52.mp4" type="video/mp4">
   您的浏览器不支持视频标签。
 </video>
 
-*备选方案：[下载视频](assets/videos/examples/Circle_area_formula.mp4)*
+*备选方案：[下载视频](assets/videos/examples/Circle_area_formula_gpt52.mp4)*
+
+**注意**：此视频使用 GPT-5.2 生成，包含 7 个详细章节，教育内容更丰富。
 
 *此视频由 Code2Video 框架使用 GPT-3.5-turbo API 自动生成。*
 
