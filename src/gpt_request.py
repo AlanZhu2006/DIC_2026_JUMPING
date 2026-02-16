@@ -502,36 +502,52 @@ def request_gpt4o(prompt, log_id=None, max_tokens=8000, max_retries=3):
     ak = cfg("gpt4o", "api_key")
     model_name = cfg("gpt4o", "model")
 
-    client = openai.AzureOpenAI(
-        azure_endpoint=base_url,
-        api_version=api_version,
-        api_key=ak,
-    )
+    # Use standard OpenAI client for official API or ChatAnywhere, AzureOpenAI for Azure endpoints
+    if "openai.com" in base_url.lower() or "chatanywhere" in base_url.lower():
+        client = OpenAI(base_url=base_url, api_key=ak)
+    else:
+        client = openai.AzureOpenAI(
+            azure_endpoint=base_url,
+            api_version=api_version,
+            api_key=ak,
+        )
 
     if log_id is None:
         log_id = generate_log_id()
 
-    extra_headers = {"X-TT-LOGID": log_id}
+    extra_headers = {"X-TT-LOGID": log_id} if "openai.com" not in base_url.lower() else {}
 
     retry_count = 0
     while retry_count < max_retries:
         try:
-            completion = client.chat.completions.create(
-                model=model_name,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": prompt,
-                            },
-                        ],
-                    }
-                ],
-                max_tokens=max_tokens,
-                extra_headers=extra_headers,
-            )
+            if "openai.com" in base_url.lower():
+                completion = client.chat.completions.create(
+                    model=model_name,
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": prompt,
+                        }
+                    ],
+                    max_tokens=max_tokens,
+                )
+            else:
+                completion = client.chat.completions.create(
+                    model=model_name,
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": prompt,
+                                },
+                            ],
+                        }
+                    ],
+                    max_tokens=max_tokens,
+                    extra_headers=extra_headers,
+                )
             return completion.choices[0].message.content
         except Exception as e:
             retry_count += 1
@@ -564,11 +580,15 @@ def request_gpt4o_token(prompt, log_id=None, max_tokens=8000, max_retries=3):
     ak = cfg("gpt4o", "api_key")
     model_name = cfg("gpt4o", "model")
 
-    client = openai.AzureOpenAI(
-        azure_endpoint=base_url,
-        api_version=api_version,
-        api_key=ak,
-    )
+    # Use standard OpenAI client for official API or ChatAnywhere, AzureOpenAI for Azure endpoints
+    if "openai.com" in base_url.lower() or "chatanywhere" in base_url.lower():
+        client = OpenAI(base_url=base_url, api_key=ak)
+    else:
+        client = openai.AzureOpenAI(
+            azure_endpoint=base_url,
+            api_version=api_version,
+            api_key=ak,
+        )
 
     if log_id is None:
         log_id = generate_log_id()
@@ -746,7 +766,7 @@ def request_o4mini_token(prompt, log_id=None, max_tokens=8000, max_retries=3, th
 
 def request_gpt5(prompt, log_id=None, max_tokens=1000, max_retries=3):
     """
-    Makes a request to the gpt-5-chat-2025-08-07 model with retry functionality.
+    Makes a request to the GPT-5.2 model with retry functionality.
 
     Args:
         prompt (str): The text prompt to send to the model
@@ -763,26 +783,37 @@ def request_gpt5(prompt, log_id=None, max_tokens=1000, max_retries=3):
     ak = cfg("gpt5", "api_key")
     model_name = cfg("gpt5", "model")
 
-    client = openai.AzureOpenAI(
-        azure_endpoint=base_url,
-        api_version=api_version,
-        api_key=ak,
-    )
+    # Use standard OpenAI client for official API or ChatAnywhere, AzureOpenAI for Azure endpoints
+    if "openai.com" in base_url.lower() or "chatanywhere" in base_url.lower():
+        client = OpenAI(base_url=base_url, api_key=ak)
+    else:
+        client = openai.AzureOpenAI(
+            azure_endpoint=base_url,
+            api_version=api_version,
+            api_key=ak,
+        )
 
     if log_id is None:
         log_id = generate_log_id()
 
-    extra_headers = {"X-TT-LOGID": log_id}
+    extra_headers = {"X-TT-LOGID": log_id} if "openai.com" not in base_url.lower() else {}
 
     retry_count = 0
     while retry_count < max_retries:
         try:
-            completion = client.chat.completions.create(
-                model=model_name,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=max_tokens,
-                extra_headers=extra_headers,
-            )
+            if "openai.com" in base_url.lower():
+                completion = client.chat.completions.create(
+                    model=model_name,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=max_tokens,
+                )
+            else:
+                completion = client.chat.completions.create(
+                    model=model_name,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=max_tokens,
+                    extra_headers=extra_headers,
+                )
             return completion
         except Exception as e:
             retry_count += 1
@@ -799,7 +830,7 @@ def request_gpt5(prompt, log_id=None, max_tokens=1000, max_retries=3):
 
 def request_gpt5_token(prompt, log_id=None, max_tokens=1000, max_retries=3):
     """
-    Makes a request to the gpt-5-chat-2025-08-07 model with retry functionality.
+    Makes a request to the GPT-5.2 model with retry functionality.
 
     Args:
         prompt (str): The text prompt to send to the model
@@ -815,28 +846,55 @@ def request_gpt5_token(prompt, log_id=None, max_tokens=1000, max_retries=3):
     ak = cfg("gpt5", "api_key")
     model_name = cfg("gpt5", "model")
 
-    client = openai.AzureOpenAI(
-        azure_endpoint=base_url,
-        api_version=api_version,
-        api_key=ak,
-    )
+    # Use standard OpenAI client for official API or ChatAnywhere, AzureOpenAI for Azure endpoints
+    if "openai.com" in base_url.lower() or "chatanywhere" in base_url.lower():
+        client = OpenAI(base_url=base_url, api_key=ak)
+    else:
+        client = openai.AzureOpenAI(
+            azure_endpoint=base_url,
+            api_version=api_version,
+            api_key=ak,
+        )
 
     if log_id is None:
         log_id = generate_log_id()
 
-    extra_headers = {"X-TT-LOGID": log_id}
+    extra_headers = {"X-TT-LOGID": log_id} if "openai.com" not in base_url.lower() else {}
 
     usage_info = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
     retry_count = 0
     while retry_count < max_retries:
         try:
-            completion = client.chat.completions.create(
-                model=model_name,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=max_tokens,
-                extra_headers=extra_headers,
-            )
+            # GPT-5.2 requires max_completion_tokens instead of max_tokens
+            if "gpt-5" in model_name.lower() or "gpt5" in model_name.lower():
+                if "openai.com" in base_url.lower():
+                    completion = client.chat.completions.create(
+                        model=model_name,
+                        messages=[{"role": "user", "content": prompt}],
+                        max_completion_tokens=max_tokens,
+                    )
+                else:
+                    completion = client.chat.completions.create(
+                        model=model_name,
+                        messages=[{"role": "user", "content": prompt}],
+                        max_completion_tokens=max_tokens,
+                        extra_headers=extra_headers,
+                    )
+            else:
+                if "openai.com" in base_url.lower():
+                    completion = client.chat.completions.create(
+                        model=model_name,
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=max_tokens,
+                    )
+                else:
+                    completion = client.chat.completions.create(
+                        model=model_name,
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=max_tokens,
+                        extra_headers=extra_headers,
+                    )
 
             if completion.usage:
                 usage_info["prompt_tokens"] = completion.usage.prompt_tokens
@@ -876,11 +934,15 @@ def request_gpt41(prompt, log_id=None, max_tokens=1000, max_retries=3):
     api_key = cfg("gpt41", "api_key")
     model_name = cfg("gpt41", "model")
 
-    client = openai.AzureOpenAI(
-        azure_endpoint=base_url,
-        api_version=api_version,
-        api_key=api_key,
-    )
+    # Use standard OpenAI client for official API or ChatAnywhere, AzureOpenAI for Azure endpoints
+    if "openai.com" in base_url.lower() or "chatanywhere" in base_url.lower():
+        client = OpenAI(base_url=base_url, api_key=api_key)
+    else:
+        client = openai.AzureOpenAI(
+            azure_endpoint=base_url,
+            api_version=api_version,
+            api_key=api_key,
+        )
 
     if log_id is None:
         log_id = generate_log_id()
@@ -893,7 +955,7 @@ def request_gpt41(prompt, log_id=None, max_tokens=1000, max_retries=3):
             completion = client.chat.completions.create(
                 model=model_name,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=max_tokens,
+                max_completion_tokens=max_tokens,
                 extra_headers=extra_headers,
             )
             return completion
@@ -928,8 +990,8 @@ def request_gpt41_token(prompt, log_id=None, max_tokens=1000, max_retries=3):
     ak = cfg("gpt41", "api_key")
     model_name = cfg("gpt41", "model")
 
-    # Use standard OpenAI client for ChatAnywhere, AzureOpenAI for Azure endpoints
-    if "chatanywhere" in base_url.lower() or "api.chatanywhere" in base_url.lower():
+    # Use standard OpenAI client for official API or ChatAnywhere, AzureOpenAI for Azure endpoints
+    if "openai.com" in base_url.lower() or "chatanywhere" in base_url.lower():
         client = OpenAI(base_url=base_url, api_key=ak)
     else:
         client = openai.AzureOpenAI(
@@ -941,7 +1003,7 @@ def request_gpt41_token(prompt, log_id=None, max_tokens=1000, max_retries=3):
     if log_id is None:
         log_id = generate_log_id()
 
-    extra_headers = {"X-TT-LOGID": log_id}
+    extra_headers = {"X-TT-LOGID": log_id} if "openai.com" not in base_url.lower() else {}
     usage_info = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
     retry_count = 0
@@ -950,7 +1012,7 @@ def request_gpt41_token(prompt, log_id=None, max_tokens=1000, max_retries=3):
             completion = client.chat.completions.create(
                 model=model_name,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=max_tokens,
+                max_completion_tokens=max_tokens,
                 extra_headers=extra_headers,
             )
 
@@ -993,14 +1055,18 @@ def request_gpt41_img(prompt, image_path=None, log_id=None, max_tokens=1000, max
     ak = cfg("gpt41", "api_key")
     model_name = cfg("gpt41", "model")
 
-    client = openai.AzureOpenAI(
-        azure_endpoint=base_url,
-        api_version=api_version,
-        api_key=ak,
-    )
+    # Use standard OpenAI client for official API or ChatAnywhere, AzureOpenAI for Azure endpoints
+    if "openai.com" in base_url.lower() or "chatanywhere" in base_url.lower():
+        client = OpenAI(base_url=base_url, api_key=ak)
+    else:
+        client = openai.AzureOpenAI(
+            azure_endpoint=base_url,
+            api_version=api_version,
+            api_key=ak,
+        )
     if log_id is None:
         log_id = generate_log_id()
-    extra_headers = {"X-TT-LOGID": log_id}
+    extra_headers = {"X-TT-LOGID": log_id} if "openai.com" not in base_url.lower() else {}
 
     if image_path:
         # 检查图片路径是否存在
@@ -1028,7 +1094,7 @@ def request_gpt41_img(prompt, image_path=None, log_id=None, max_tokens=1000, max
             completion = client.chat.completions.create(
                 model=model_name,
                 messages=messages,
-                max_tokens=max_tokens,
+                max_completion_tokens=max_tokens,
                 extra_headers=extra_headers,
             )
             return completion

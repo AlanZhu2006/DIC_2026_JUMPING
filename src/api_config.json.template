@@ -6,6 +6,12 @@
         "model": "gemini-pro"
     },
     "gpt41": {
+        "base_url": "https://api.openai.com/v1",
+        "api_version": "",
+        "api_key": "YOUR_OPENAI_API_KEY",
+        "model": "gpt-4o-mini"
+    },
+    "gpt41-chatanywhere": {
         "base_url": "https://api.chatanywhere.tech/v1",
         "api_version": "2024-03-01-preview",
         "api_key": "YOUR_CHATANYWHERE_API_KEY",
@@ -24,6 +30,12 @@
         "model": "o4-mini-2025-04-16"
     },
     "gpt4o": {
+        "base_url": "https://api.openai.com/v1",
+        "api_version": "",
+        "api_key": "YOUR_OPENAI_API_KEY",
+        "model": "gpt-4o"
+    },
+    "gpt4o-chatanywhere": {
         "base_url": "https://api.chatanywhere.tech/v1",
         "api_version": "2024-03-01-preview",
         "api_key": "YOUR_CHATANYWHERE_API_KEY",
@@ -36,5 +48,12 @@
     },
     "iconfinder": {
         "api_key": "YOUR_ICONFINDER_KEY"
+    },
+    "tts": {
+        "base_url": "https://api.openai.com/v1",
+        "api_key": "YOUR_OPENAI_API_KEY",
+        "model": "tts-1",
+        "voice": "nova",
+        "speed": 1.0
     }
 }

@@ -65,25 +65,34 @@
   - ✅ API 连接测试脚本已创建
   - ✅ 配置指南和文档已添加
 
+- [x] **阶段 6：TTS 语音集成**
+  - ✅ OpenAI TTS API 已集成 (`tts_audio.py`)
+  - ✅ 多种声音支持 (nova, alloy, echo, fable, onyx, shimmer)
+  - ✅ 从分镜自动生成旁白
+  - ✅ FFmpeg 音视频合并
+  - ✅ 完整流程已测试（包含音频输出）
+
 - [x] **阶段 7：功能测试**
   - ✅ 单知识点测试已完成
-  - ✅ 视频生成流程已验证
+  - ✅ 视频生成流程已验证（包含 TTS 语音）
   - ✅ 多个测试案例已完成（使用不同 API 模型）
   - ✅ 成功率：100%（知识点处理），100%（使用 GPT-5.2 的视频渲染）
-  - ✅ 生成文件：大纲、故事板、Manim 代码和最终视频
+  - ✅ 生成文件：大纲、分镜、Manim 代码、TTS 音频和最终视频
 
 ### 测试结果总结
 
-**最新测试** (2026-02-04) - GPT-5.2:
+**最新测试** (2026-02-16) - GPT-5.2 + TTS:
 - **知识点**: "圆形面积公式"
-- **API**: gpt-5 (官方 OpenAI, gpt-5.2)
-- **耗时**: 4.80 分钟
-- **输出**: 成功生成 `Circle_area_formula.mp4`
+- **API**: gpt-41 (官方 OpenAI, gpt-5.2)
+- **耗时**: 5.70 分钟
+- **输出**: 成功生成 `Circle_area_formula.mp4` （包含语音旁白）
 - **章节**: 生成 7 个章节，7/7 成功渲染 (100%)
-- **Token 使用**: 29,222 tokens
-- **质量**: 内容更丰富，章节更详细
+- **音频**: 7/7 章节已生成 TTS 旁白
+- **Token 使用**: 30,353 tokens
+- **功能**: 完整音视频流程 + OpenAI TTS
 
 **之前的测试**：
+- **GPT-5.2 测试 (无音频)**: 7 个章节，100% 成功率，4.80 分钟，29,222 tokens
 - **GPT-4o 测试**: 5 个章节，100% 成功率，1.99 分钟，13,198 tokens
 - **ChatAnywhere 测试**: 6 个章节，83.3% 成功率，3.46 分钟
 
@@ -124,7 +133,8 @@ pip install -r requirements.txt
 
 **已安装的关键依赖**:
 - `manim==0.19.0` - 动画引擎
-- `openai==1.90.0` - LLM API
+- `openai==1.90.0` - LLM API + TTS
+- `pydub==0.25.1` - 音频处理
 - `numpy==2.2.6` - 数值计算
 - `scipy==1.15.3` - 科学计算
 - `opencv-python==4.12.0.88` - 图像/视频处理
@@ -442,37 +452,36 @@ manim -ql test_manim.py TestScene
 
 ```
 Code2Video/
-│── src/
-│   ├── agent.py              # 核心智能体实现
+├── src/
+│   ├── agent.py              # 核心智能体实现（包含 TTS）
+│   ├── tts_audio.py          # TTS 语音生成模块
+│   ├── gpt_request.py        # LLM API 请求处理
+│   ├── scope_refine.py       # 代码修复与优化
+│   ├── utils.py              # 工具函数
+│   ├── run_agent_single.ps1  # Windows 单知识点脚本
+│   ├── run_agent_single.sh   # Linux 单知识点脚本
 │   ├── run_agent.sh          # 批量生成脚本
-│   ├── run_agent_single.sh   # 单知识点生成脚本
-│   ├── api_config.json       # API 配置
+│   ├── api_config.json       # API 配置（不在 git 中）
+│   ├── api_config.json.template  # API 配置模板
 │   ├── requirements.txt      # Python 依赖
-│   └── ...
+│   └── CASES/                # 生成的案例输出
 │
-├── assets/
-│   ├── icons/                # IconFinder 下载的视觉资源缓存
-│   └── reference/            # 参考图像
-│
-├── json_files/               # JSON 格式的主题列表和元数据
 ├── prompts/                  # LLM 调用的提示模板
-│   ├── stage1.py            # Planner 阶段
-│   ├── stage2.py            # Coder 阶段
-│   ├── stage3.py            # Critic 阶段
+│   ├── stage1.py            # 大纲生成
+│   ├── stage2.py            # 分镜生成
+│   ├── stage3.py            # Manim 代码生成
 │   └── ...
 │
+├── assets/                   # 视觉资产和参考
+├── json_files/               # JSON 格式的主题列表和元数据
+├── figures/                  # 图片资源
 ├── venv/                     # Python 虚拟环境
 │
-├── media/                    # Manim 输出目录
-│   └── videos/
-│       ├── complex_example/  # 复杂示例视频
-│       └── test_manim/       # 测试场景视频
-│
-├── complex_example.py        # 包含 DIC JUMPING 的复杂示例
-├── test_manim.py            # 简单测试场景
-│
-└── CASES/                    # 生成的案例，按 FOLDER_PREFIX 组织
-    └── VisualKiwi-single/   # 示例单主题生成结果
+├── .github/                  # GitHub 工作流
+├── .gitignore               # Git 忽略规则
+├── LICENSE                  # 许可证文件
+├── README.md                # 英文文档
+└── README.zh-CN.md          # 中文文档
 ```
 
 ---
@@ -668,10 +677,10 @@ def visualkiwi_mcp_tool(user_prompt: str) -> Dict:
 - [x] 配置 API 和依赖
 - [x] 环境设置（Python, FFmpeg, LaTeX）
 - [x] Manim 验证和示例
-- [x] API 配置（ChatAnywhere 和官方 API）
-- [x] 功能测试（单知识点）
+- [x] TTS 语音集成（OpenAI TTS API）
+- [x] 完整音视频流水线
 - [ ] 创建 MCP 服务器接口
-- [ ] 实现视频生成 API
+- [ ] 实现视频生成 REST API
 
 ### 阶段 2：交互式组件
 - [ ] 开发交互式 Canvas 组件

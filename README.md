@@ -65,25 +65,34 @@ Most students currently use LLMs primarily for text-based learning (summaries, e
   - ✅ API connection test scripts created
   - ✅ Configuration guides and documentation added
 
+- [x] **Phase 6: TTS Audio Integration**
+  - ✅ OpenAI TTS API integrated (`tts_audio.py`)
+  - ✅ Multiple voice support (nova, alloy, echo, fable, onyx, shimmer)
+  - ✅ Auto-generate narration from storyboard
+  - ✅ Audio-video merge with FFmpeg
+  - ✅ Full pipeline tested with audio output
+
 - [x] **Phase 7: Functional Testing**
   - ✅ Single knowledge point test completed
-  - ✅ Video generation pipeline verified
+  - ✅ Video generation pipeline verified (with TTS audio)
   - ✅ Multiple test cases completed with different API models
   - ✅ Success rate: 100% (knowledge point processing), 100% (video rendering with GPT-5.2)
-  - ✅ Generated files: outline, storyboard, Manim code, and final video
+  - ✅ Generated files: outline, storyboard, Manim code, TTS audio, and final video
 
 ### Test Results Summary
 
-**Latest Test** (2026-02-04) - GPT-5.2:
+**Latest Test** (2026-02-16) - GPT-5.2 with TTS:
 - **Knowledge Point**: "Circle area formula"
-- **API**: gpt-5 (Official OpenAI, gpt-5.2)
-- **Duration**: 4.80 minutes
-- **Output**: Successfully generated `Circle_area_formula.mp4`
+- **API**: gpt-41 (Official OpenAI, gpt-5.2)
+- **Duration**: 5.70 minutes
+- **Output**: Successfully generated `Circle_area_formula.mp4` with audio narration
 - **Sections**: Generated 7 sections, 7/7 successfully rendered (100%)
-- **Token Usage**: 29,222 tokens
-- **Quality**: Enhanced content with more detailed sections
+- **Audio**: 7/7 sections with TTS narration generated
+- **Token Usage**: 30,353 tokens
+- **Features**: Full audio-video pipeline with OpenAI TTS
 
 **Previous Tests**:
+- **GPT-5.2 Test (no audio)**: 7 sections, 100% success, 4.80 minutes, 29,222 tokens
 - **GPT-4o Test**: 5 sections, 100% success, 1.99 minutes, 13,198 tokens
 - **ChatAnywhere Test**: 6 sections, 83.3% success, 3.46 minutes
 
@@ -124,7 +133,8 @@ pip install -r requirements.txt
 
 **Key Dependencies Installed**:
 - `manim==0.19.0` - Animation engine
-- `openai==1.90.0` - LLM API
+- `openai==1.90.0` - LLM API + TTS
+- `pydub==0.25.1` - Audio processing
 - `numpy==2.2.6` - Numerical computing
 - `scipy==1.15.3` - Scientific computing
 - `opencv-python==4.12.0.88` - Image/video processing
@@ -441,37 +451,36 @@ manim -ql test_manim.py TestScene
 
 ```
 Code2Video/
-│── src/
-│   ├── agent.py              # Core agent implementation
+├── src/
+│   ├── agent.py              # Core agent implementation (with TTS)
+│   ├── tts_audio.py          # TTS audio generation module
+│   ├── gpt_request.py        # LLM API request handlers
+│   ├── scope_refine.py       # Code fixing and refinement
+│   ├── utils.py              # Utility functions
+│   ├── run_agent_single.ps1  # Windows single knowledge point script
+│   ├── run_agent_single.sh   # Linux single knowledge point script
 │   ├── run_agent.sh          # Batch generation script
-│   ├── run_agent_single.sh   # Single knowledge point script
-│   ├── api_config.json       # API configuration
+│   ├── api_config.json       # API configuration (not in git)
+│   ├── api_config.json.template  # API config template
 │   ├── requirements.txt      # Python dependencies
-│   └── ...
+│   └── CASES/                # Generated cases output
 │
-├── assets/
-│   ├── icons/                # Visual asset cache from IconFinder
-│   └── reference/            # Reference images
-│
-├── json_files/               # JSON-based topic lists & metadata
 ├── prompts/                  # Prompt templates for LLM calls
-│   ├── stage1.py            # Planner stage
-│   ├── stage2.py            # Coder stage
-│   ├── stage3.py            # Critic stage
+│   ├── stage1.py            # Outline generation
+│   ├── stage2.py            # Storyboard generation
+│   ├── stage3.py            # Manim code generation
 │   └── ...
 │
+├── assets/                   # Visual assets and references
+├── json_files/               # JSON-based topic lists & metadata
+├── figures/                  # Figure resources
 ├── venv/                     # Python virtual environment
 │
-├── media/                    # Manim output directory
-│   └── videos/
-│       ├── complex_example/  # Complex example videos
-│       └── test_manim/       # Test scene videos
-│
-├── complex_example.py        # Complex Manim example with DIC JUMPING
-├── test_manim.py            # Simple test scene
-│
-└── CASES/                    # Generated cases, organized by FOLDER_PREFIX
-    └── VisualKiwi-single/   # Example single-topic generation results
+├── .github/                  # GitHub workflows
+├── .gitignore               # Git ignore rules
+├── LICENSE                  # License file
+├── README.md                # English documentation
+└── README.zh-CN.md          # Chinese documentation
 ```
 
 ---
@@ -667,8 +676,10 @@ In the chat interface, render different components based on the returned type:
 - [x] Configure APIs and dependencies
 - [x] Environment setup (Python, FFmpeg, LaTeX)
 - [x] Manim verification and examples
+- [x] TTS audio integration (OpenAI TTS API)
+- [x] Full audio-video pipeline
 - [ ] Create MCP server interface
-- [ ] Implement video generation API
+- [ ] Implement video generation REST API
 
 ### Phase 2: Interactive Components
 - [ ] Develop interactive Canvas components

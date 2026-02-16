@@ -5,7 +5,7 @@ import time
 import random
 import subprocess
 from typing import List, Dict, Any, Optional, Tuple, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed, ThreadPoolExecutor
 
@@ -14,6 +14,7 @@ from prompts import *
 from utils import *
 from scope_refine import *
 from external_assets import process_storyboard_with_assets
+from tts_audio import TTSGenerator, merge_video_audio, get_audio_duration, get_video_duration
 
 
 @dataclass
@@ -44,9 +45,14 @@ class VideoFeedback:
 class RunConfig:
     use_feedback: bool = True
     use_assets: bool = True
+    use_tts: bool = True  # Enable TTS audio narration
     api: Callable = None
     feedback_rounds: int = 2
     iconfinder_api_key: str = ""
+    # TTS Configuration
+    tts_voice: str = "nova"  # alloy, echo, fable, onyx, nova, shimmer
+    tts_model: str = "tts-1"  # tts-1 or tts-1-hd
+    tts_speed: float = 1.0  # 0.25 to 4.0
     max_code_token_length: int = 10000
     max_fix_bug_tries: int = 10
     max_regenerate_tries: int = 10
@@ -69,6 +75,7 @@ class TeachingVideoAgent:
 
         self.use_feedback = cfg.use_feedback
         self.use_assets = cfg.use_assets
+        self.use_tts = cfg.use_tts
         self.API = cfg.api
         self.feedback_rounds = cfg.feedback_rounds
         self.iconfinder_api_key = cfg.iconfinder_api_key
@@ -77,6 +84,12 @@ class TeachingVideoAgent:
         self.max_regenerate_tries = cfg.max_regenerate_tries
         self.max_feedback_gen_code_tries = cfg.max_feedback_gen_code_tries
         self.max_mllm_fix_bugs_tries = cfg.max_mllm_fix_bugs_tries
+        
+        # TTS configuration
+        self.tts_voice = cfg.tts_voice
+        self.tts_model = cfg.tts_model
+        self.tts_speed = cfg.tts_speed
+        self.tts_generator = None  # Lazy initialization
 
         """2. Path for output"""
         self.folder = folder
@@ -107,6 +120,7 @@ class TeachingVideoAgent:
         self.sections = []
         self.section_codes = {}
         self.section_videos = {}
+        self.section_audios = {}  # TTS audio files for each section
         self.video_feedbacks = {}
 
         """6. For Efficiency"""
@@ -364,7 +378,12 @@ class TeachingVideoAgent:
             try:
                 scene_name = f"{section_id.title().replace('_', '')}Scene"
                 code_file = f"{section_id}.py"
-                cmd = ["manim", "-ql", str(code_file), scene_name]
+                # Use sys.executable to get the Python path, then derive manim path
+                import sys
+                import platform
+                manim_exe = "manim.exe" if platform.system() == "Windows" else "manim"
+                manim_path = str(Path(sys.executable).parent / manim_exe)
+                cmd = [manim_path, "-ql", str(code_file), scene_name]
 
                 result = subprocess.run(cmd, capture_output=True, text=True, cwd=self.output_dir, timeout=180)
 
@@ -664,8 +683,67 @@ class TeachingVideoAgent:
 
         return results
 
+    def generate_audios(self) -> Dict[str, str]:
+        """Generate TTS audio for all sections from lecture_lines"""
+        if not self.use_tts:
+            print("🔇 TTS disabled, skipping audio generation")
+            return {}
+        
+        if not self.sections:
+            raise ValueError("No sections available for audio generation")
+        
+        print(f"🎙️ Generating TTS audio for {len(self.sections)} sections...")
+        
+        # Initialize TTS generator (lazy loading)
+        if self.tts_generator is None:
+            try:
+                self.tts_generator = TTSGenerator(
+                    model=self.tts_model,
+                    voice=self.tts_voice,
+                    speed=self.tts_speed,
+                )
+            except Exception as e:
+                print(f"❌ Failed to initialize TTS generator: {e}")
+                return {}
+        
+        audio_dir = self.output_dir / "audio"
+        audio_dir.mkdir(exist_ok=True)
+        
+        for section in self.sections:
+            section_id = section.id
+            lecture_lines = section.lecture_lines
+            
+            if not lecture_lines:
+                print(f"⚠️ {section_id} has no lecture_lines, skipping audio")
+                continue
+            
+            # Check if audio already exists
+            section_audio_path = audio_dir / f"{section_id}_audio.mp3"
+            if section_audio_path.exists():
+                print(f"📂 Found existing audio: {section_audio_path.name}")
+                self.section_audios[section_id] = str(section_audio_path)
+                continue
+            
+            try:
+                audio_path = self.tts_generator.generate_section_audio(
+                    section_id=section_id,
+                    lecture_lines=lecture_lines,
+                    output_dir=self.output_dir,
+                    voice=self.tts_voice,
+                )
+                
+                if audio_path:
+                    self.section_audios[section_id] = audio_path
+                    print(f"✅ {section_id} audio generated")
+                    
+            except Exception as e:
+                print(f"❌ Failed to generate audio for {section_id}: {e}")
+        
+        print(f"🎵 Audio generation complete: {len(self.section_audios)}/{len(self.sections)} sections")
+        return self.section_audios
+
     def merge_videos(self, output_filename: str = None) -> str:
-        """Step 5: Merge all section videos"""
+        """Step 5: Merge all section videos (with optional audio)"""
         if not self.section_videos:
             raise ValueError("No video files available to merge")
 
@@ -675,15 +753,49 @@ class TeachingVideoAgent:
 
         output_path = self.output_dir / output_filename
 
+        # Step 5a: If TTS is enabled, merge audio with each section video first
+        videos_to_merge = self.section_videos.copy()
+        
+        if self.use_tts and self.section_audios:
+            print(f"🎵 Merging audio with section videos...")
+            merged_dir = self.output_dir / "merged"
+            merged_dir.mkdir(exist_ok=True)
+            
+            for section_id, video_path in sorted(self.section_videos.items()):
+                audio_path = self.section_audios.get(section_id)
+                
+                if audio_path and Path(audio_path).exists():
+                    # Merge this section's video with its audio
+                    merged_video_path = merged_dir / f"{section_id}_with_audio.mp4"
+                    
+                    if merged_video_path.exists():
+                        print(f"📂 Found existing merged video: {merged_video_path.name}")
+                        videos_to_merge[section_id] = str(merged_video_path)
+                    else:
+                        result = merge_video_audio(
+                            video_path=video_path,
+                            audio_path=audio_path,
+                            output_path=str(merged_video_path),
+                        )
+                        if result:
+                            videos_to_merge[section_id] = result
+                        else:
+                            print(f"⚠️ Failed to merge audio for {section_id}, using video without audio")
+                else:
+                    print(f"⚠️ No audio for {section_id}, using video without audio")
+
         print(f"🔗 Start merging section videos...")
 
         video_list_file = self.output_dir / "video_list.txt"
         with open(video_list_file, "w", encoding="utf-8") as f:
-            for section_id in sorted(self.section_videos.keys()):
-                video_path = self.section_videos[section_id].replace(f"{self.output_dir}/", "")
+            for section_id in sorted(videos_to_merge.keys()):
+                # Use relative path from output_dir
+                video_path = videos_to_merge[section_id]
+                if str(self.output_dir) in video_path:
+                    video_path = video_path.replace(f"{self.output_dir}/", "").replace(f"{self.output_dir}\\", "")
                 f.write(f"file '{video_path}'\n")
 
-        # ffmpeg
+        # ffmpeg concat
         try:
             result = subprocess.run(
                 ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(video_list_file), "-c", "copy", str(output_path)],
@@ -701,12 +813,17 @@ class TeachingVideoAgent:
             return None
 
     def GENERATE_VIDEO(self) -> str:
-        """Generate complete video with MLLM feedback optimization"""
+        """Generate complete video with MLLM feedback optimization and optional TTS audio"""
         try:
             self.generate_outline()
             self.generate_storyboard()
             self.generate_codes()
             self.render_all_sections()
+            
+            # Generate TTS audio if enabled
+            if self.use_tts:
+                self.generate_audios()
+            
             final_video = self.merge_videos()
             if final_video:
                 print(f"🎉 Video generated success: {final_video}")
