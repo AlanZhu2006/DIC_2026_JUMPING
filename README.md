@@ -36,6 +36,28 @@ Most students currently use LLMs primarily for text-based learning (summaries, e
 
 ## ✅ Deployment Status
 
+### Latest Updates (2026-02-18)
+
+- ✅ **Web UI redesigned** - Professional dark theme with minimal icons and clean layout
+- ✅ **GitHub Pages deployed** - Web UI now available at [https://AlanZhu2006.github.io/DIC_2026_JUMPING/](https://AlanZhu2006.github.io/DIC_2026_JUMPING/)
+- ✅ API server startup now auto-clears the target port to avoid stale processes
+- ✅ `start_server.ps1` added to clear ports and launch the API server in one step
+- ✅ Web UI includes tutorial section and server help guidance
+- ✅ All code comments and user-facing messages are unified in English (except the Chinese README)
+
+### 🌐 Live Demo
+
+**Web UI**: [https://AlanZhu2006.github.io/DIC_2026_JUMPING/](https://AlanZhu2006.github.io/DIC_2026_JUMPING/)
+
+The web interface allows you to:
+- 🎬 Generate educational videos from any knowledge point
+- 🤖 Choose AI model (GPT-5.2, GPT-4o, Claude)
+- 🎙️ Add TTS narration with multiple voice options
+- 📊 Monitor real-time generation progress
+- 📥 Download generated videos directly
+
+> **Note**: The web UI requires a local backend server running. See [Quick Start](#-quick-start) for setup instructions.
+
 ### Completed Deployment Steps
 
 - [x] **Phase 1: Environment Setup**
@@ -79,6 +101,14 @@ Most students currently use LLMs primarily for text-based learning (summaries, e
   - ✅ Success rate: 100% (knowledge point processing), 100% (video rendering with GPT-5.2)
   - ✅ Generated files: outline, storyboard, Manim code, TTS audio, and final video
 
+- [x] **Phase 8: Web UI & GitHub Pages**
+  - ✅ Modern web interface (`web/index.html`) with Tailwind CSS
+  - ✅ Real-time progress tracking via Server-Sent Events (SSE)
+  - ✅ GitHub Pages deployed for public access
+  - ✅ Server help modal with port-clearing instructions
+  - ✅ Model and voice selection dropdowns
+  - ✅ Direct video download after generation
+
 ### Test Results Summary
 
 **Latest Test** (2026-02-16) - GPT-5.2 with TTS:
@@ -111,6 +141,13 @@ Most students currently use LLMs primarily for text-based learning (summaries, e
 # After activation, verify
 python --version  # Should show Python 3.11.9
 pip --version     # Should show pip 26.0
+```
+
+#### Start the API Server (Windows PowerShell)
+
+```powershell
+# Auto-clear port 8000 and start the API server
+./start_server.ps1
 ```
 
 #### System Requirements
@@ -678,8 +715,17 @@ In the chat interface, render different components based on the returned type:
 - [x] Manim verification and examples
 - [x] TTS audio integration (OpenAI TTS API)
 - [x] Full audio-video pipeline
+- [x] Implement video generation REST API (FastAPI + SSE)
+- [x] Web UI with real-time progress tracking
 - [ ] Create MCP server interface
-- [ ] Implement video generation REST API
+
+### Phase 1.5: Enhancements (🔄 Next Steps)
+- [ ] User authentication system
+- [ ] Cloud deployment (Azure / Vercel)
+- [ ] More example video templates
+- [ ] Video quality options (480p / 720p / 1080p)
+- [ ] Batch video generation
+- [ ] Video caching and CDN delivery
 
 ### Phase 2: Interactive Components
 - [ ] Develop interactive Canvas components

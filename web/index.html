@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code2Video - AI Educational Video Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #f5f5f7;
+            min-height: 100vh;
+        }
+        
+        .gradient-bg {
+            /* Additional overlay effect */
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+        }
+        
+        .card-light {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #a78bfa);
+            background-size: 200% 100%;
+            animation: shimmer 2s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .pulse-dot {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        .log-item {
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: #ffffff;
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        .step-num {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        input, select {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .tag {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        video {
+            border-radius: 12px;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="#" class="text-lg font-semibold tracking-tight">
+                <span class="gradient-text">Code2Video</span>
+            </a>
+            <div class="hidden md:flex items-center gap-8 text-sm">
+                <a href="#generator" class="nav-link">Generator</a>
+                <a href="#tutorial" class="nav-link">Tutorial</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="https://github.com/AlanZhu2006/DIC_2026_JUMPING" target="_blank" class="nav-link flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-16 px-6">
+        <div class="max-w-3xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+                AI-Powered <span class="gradient-text">Educational Video</span> Generation
+            </h1>
+            <p class="text-lg text-white/50 mb-10 max-w-xl mx-auto leading-relaxed">
+                Transform any knowledge point into beautifully animated educational videos using AI and Manim.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#generator" class="btn-primary px-8 py-3 rounded-xl font-medium">
+                    Start Generating
+                </a>
+                <a href="#tutorial" class="btn-secondary px-8 py-3 rounded-xl font-medium">
+                    View Tutorial
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-16 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl font-semibold mb-3">Built for Educators</h2>
+                <p class="text-white/50">Powerful features to create quality educational content</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="feature-card card p-6">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    </div>
+                    <h3 class="font-medium mb-2">AI-Powered</h3>
+                    <p class="text-sm text-white/50">GPT-5.2, GPT-4o, Claude models for intelligent content generation</p>
+                </div>
+                <div class="feature-card card p-6">
+                    <div class="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                    </div>
+                    <h3 class="font-medium mb-2">TTS Narration</h3>
+                    <p class="text-sm text-white/50">6 professional voices via OpenAI TTS for natural audio</p>
+                </div>
+                <div class="feature-card card p-6">
+                    <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V1m0 3h2a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h2m0 0V1m8 0H9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l2 2 4-4"/></svg>
+                    </div>
+                    <h3 class="font-medium mb-2">Manim Animations</h3>
+                    <p class="text-sm text-white/50">Beautiful mathematical animations powered by Manim</p>
+                </div>
+                <div class="feature-card card p-6">
+                    <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h3 class="font-medium mb-2">Real-time Progress</h3>
+                    <p class="text-sm text-white/50">Watch your video being created with live updates</p>
+                </div>
+                <div class="feature-card card p-6">
+                    <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    </div>
+                    <h3 class="font-medium mb-2">Any Topic</h3>
+                    <p class="text-sm text-white/50">Math, physics, algorithms, chemistry - any concept</p>
+                </div>
+                <div class="feature-card card p-6">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    </div>
+                    <h3 class="font-medium mb-2">Easy Download</h3>
+                    <p class="text-sm text-white/50">Download generated videos instantly in high quality</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tutorial Section -->
+    <section id="tutorial" class="py-16 px-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl font-semibold mb-3">Quick Start</h2>
+                <p class="text-white/50">Get started in 3 simple steps</p>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- Step 1 -->
+                <div class="card-light p-6">
+                    <div class="flex gap-4">
+                        <div class="step-num shrink-0 text-white">1</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-900 mb-2">Start the Backend Server</h3>
+                            <p class="text-sm text-gray-500 mb-4">Open PowerShell in the project folder and run:</p>
+                            <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto">
+                                <span class="text-gray-500"># Recommended: One-click startup</span><br>
+                                .\start_server.ps1<br><br>
+                                <span class="text-gray-500"># Or manual startup</span><br>
+                                .\venv\Scripts\Activate.ps1<br>
+                                cd src<br>
+                                python -m uvicorn api_server:app --port 8000
+                            </div>
+                            <p class="mt-3 text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
+                                Requires Python 3.11+ with all dependencies installed
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="card-light p-6">
+                    <div class="flex gap-4">
+                        <div class="step-num shrink-0 text-white">2</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-900 mb-2">Configure API Keys</h3>
+                            <p class="text-sm text-gray-500 mb-4">Create <code class="bg-gray-100 px-2 py-1 rounded text-gray-700">src/api_config.json</code>:</p>
+                            <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto">
+<pre>{
+  "gpt41": {
+    "base_url": "https://api.openai.com/v1",
+    "api_key": "sk-YOUR_API_KEY",
+    "model": "gpt-4o-mini"
+  }
+}</pre>
+                            </div>
+                            <div class="mt-3 flex gap-2">
+                                <a href="https://platform.openai.com/api-keys" target="_blank" class="text-xs text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg hover:bg-indigo-100 transition">
+                                    Get OpenAI API Key →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="card-light p-6">
+                    <div class="flex gap-4">
+                        <div class="step-num shrink-0 text-white">3</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-900 mb-2">Generate Your Video</h3>
+                            <p class="text-sm text-gray-500 mb-4">Use the generator below or run via command line:</p>
+                            <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400">
+                                python agent.py --API gpt-41 --knowledge_point "Circle area formula"
+                            </div>
+                            <div class="mt-3 flex gap-2 text-gray-500 text-xs">
+                                <span class="tag">Output: src/CASES/</span>
+                                <span class="tag">~3-6 min per video</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Generator Section -->
+    <section id="generator" class="py-16 px-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-semibold mb-3">Video Generator</h2>
+                <p class="text-white/50">Enter a topic and let AI create your educational video</p>
+            </div>
+
+            <div class="card-light p-8">
+                <!-- Server URL -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Backend Server</label>
+                    <div class="flex gap-2">
+                        <input 
+                            type="text" 
+                            id="serverUrl" 
+                            value="http://localhost:8000"
+                            class="flex-1 px-4 py-3 rounded-lg text-gray-800"
+                        >
+                        <button 
+                            onclick="testConnection()"
+                            class="px-5 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition text-sm font-medium"
+                        >
+                            Test
+                        </button>
+                        <button 
+                            onclick="toggleServerHelp()"
+                            class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition"
+                            title="Help"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </button>
+                    </div>
+                    <p id="connectionStatus" class="text-sm mt-2 text-gray-500">Click "Test" to check connection</p>
+                    
+                    <!-- Help Panel -->
+                    <div id="serverHelpModal" class="hidden mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-medium text-gray-800">Server Startup</h3>
+                            <button onclick="toggleServerHelp()" class="text-gray-400 hover:text-gray-600">&times;</button>
+                        </div>
+                        <div class="text-sm text-gray-600 space-y-3">
+                            <p><strong>Quick Start:</strong></p>
+                            <code class="block bg-gray-800 text-green-400 p-3 rounded-lg">.\start_server.ps1</code>
+                            <p class="mt-3"><strong>Port in use?</strong></p>
+                            <code class="block bg-gray-800 text-green-400 p-3 rounded-lg">netstat -ano | findstr ":8000"<br>taskkill /F /PID &lt;PID&gt;</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Topic Input -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Knowledge Point</label>
+                    <input 
+                        type="text" 
+                        id="knowledgePoint" 
+                        value="Circle area formula"
+                        placeholder="e.g.: Pythagorean theorem, Binary search, Newton's laws..."
+                        class="w-full px-4 py-3 rounded-lg text-gray-800"
+                    >
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <button onclick="setTopic('Circle area formula')" class="text-xs px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-md hover:bg-indigo-100 transition">Circle area</button>
+                        <button onclick="setTopic('Pythagorean theorem')" class="text-xs px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-md hover:bg-indigo-100 transition">Pythagorean theorem</button>
+                        <button onclick="setTopic('Binary search algorithm')" class="text-xs px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-md hover:bg-indigo-100 transition">Binary search</button>
+                        <button onclick="setTopic('Newton\\'s laws of motion')" class="text-xs px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-md hover:bg-indigo-100 transition">Newton's laws</button>
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">AI Model</label>
+                        <select id="apiModel" class="w-full px-4 py-3 rounded-lg text-gray-800">
+                            <option value="gpt-41">GPT-5.2</option>
+                            <option value="gpt-4o">GPT-4o</option>
+                            <option value="claude">Claude</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Voice</label>
+                        <select id="ttsVoice" class="w-full px-4 py-3 rounded-lg text-gray-800">
+                            <option value="nova">Nova</option>
+                            <option value="alloy">Alloy</option>
+                            <option value="echo">Echo</option>
+                            <option value="onyx">Onyx</option>
+                            <option value="fable">Fable</option>
+                            <option value="shimmer">Shimmer</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">TTS Narration</label>
+                        <select id="useTts" class="w-full px-4 py-3 rounded-lg text-gray-800">
+                            <option value="true">Enabled</option>
+                            <option value="false">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <button 
+                    id="generateBtn"
+                    onclick="startGeneration()"
+                    class="w-full py-4 btn-primary text-white font-medium rounded-xl text-base"
+                >
+                    Start Generation
+                </button>
+
+                <!-- Progress -->
+                <div id="progressSection" class="mt-8 hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Progress</span>
+                        <span id="progressPercent" class="text-sm font-semibold text-indigo-600">0%</span>
+                    </div>
+                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="progressBar" class="h-full progress-bar rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="progressMessage" class="mt-3 text-sm text-gray-600 flex items-center">
+                        <span class="w-2 h-2 bg-indigo-500 rounded-full mr-2 pulse-dot"></span>
+                        <span>Preparing...</span>
+                    </p>
+                </div>
+
+                <!-- Log -->
+                <div id="logSection" class="mt-6 hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Log</span>
+                        <button onclick="clearLogs()" class="text-xs text-indigo-600 hover:underline">Clear</button>
+                    </div>
+                    <div id="logContainer" class="bg-gray-900 rounded-lg p-4 max-h-40 overflow-y-auto font-mono text-xs text-gray-400"></div>
+                </div>
+
+                <!-- Video Player -->
+                <div id="videoSection" class="mt-8 hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="font-medium text-gray-700">Generated Video</span>
+                        <a id="downloadLink" href="#" download class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition text-sm font-medium">
+                            Download
+                        </a>
+                    </div>
+                    <video id="videoPlayer" controls class="w-full shadow-lg">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-white/5">
+        <div class="max-w-5xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-center md:text-left">
+                    <div class="text-lg font-semibold gradient-text mb-2">Code2Video</div>
+                    <p class="text-sm text-white/40">AI-powered educational video generation</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm text-white/50">
+                    <a href="https://github.com/AlanZhu2006/DIC_2026_JUMPING" class="hover:text-white transition">GitHub</a>
+                    <a href="https://github.com/AlanZhu2006/DIC_2026_JUMPING/blob/main/README.md" class="hover:text-white transition">Documentation</a>
+                    <a href="https://www.manim.community/" class="hover:text-white transition">Manim</a>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-white/5 text-center text-xs text-white/30">
+                <p>Built with Python, Manim, FastAPI, and OpenAI</p>
+                <p class="mt-1">© 2026 VisualKiwi Project · DIC JUMPING Team</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentTaskId = null;
+        let eventSource = null;
+
+        function getServerUrl() {
+            return document.getElementById('serverUrl').value.replace(/\/$/, '');
+        }
+        
+        function toggleServerHelp() {
+            document.getElementById('serverHelpModal').classList.toggle('hidden');
+        }
+        
+        function setTopic(topic) {
+            document.getElementById('knowledgePoint').value = topic;
+        }
+
+        async function testConnection() {
+            const status = document.getElementById('connectionStatus');
+            const serverUrl = getServerUrl();
+            status.textContent = 'Connecting...';
+            status.className = 'text-sm mt-2 text-amber-600';
+            
+            try {
+                const response = await fetch(`${serverUrl}/`, { method: 'GET', mode: 'cors' });
+                if (response.ok) {
+                    const data = await response.json();
+                    status.textContent = `Connected: ${data.name} v${data.version}`;
+                    status.className = 'text-sm mt-2 text-emerald-600';
+                } else {
+                    throw new Error('Server error');
+                }
+            } catch (error) {
+                status.textContent = 'Connection failed - Make sure server is running';
+                status.className = 'text-sm mt-2 text-red-500';
+            }
+        }
+
+        function addLog(message, type = 'info') {
+            const container = document.getElementById('logContainer');
+            const colors = { info: 'text-gray-400', success: 'text-emerald-400', error: 'text-red-400', warning: 'text-amber-400' };
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = `log-item ${colors[type] || colors.info} py-0.5`;
+            div.textContent = `[${time}] ${message}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('logContainer').innerHTML = '';
+        }
+
+        function updateProgress(progress, message) {
+            const safeProgress = Math.max(0, Math.min(100, progress));
+            document.getElementById('progressBar').style.width = `${safeProgress}%`;
+            document.getElementById('progressPercent').textContent = `${safeProgress}%`;
+            document.getElementById('progressMessage').innerHTML = `
+                <span class="w-2 h-2 bg-indigo-500 rounded-full mr-2 pulse-dot"></span>
+                <span>${message}</span>
+            `;
+        }
+
+        async function startGeneration() {
+            const serverUrl = getServerUrl();
+            const knowledgePoint = document.getElementById('knowledgePoint').value.trim();
+            const apiModel = document.getElementById('apiModel').value;
+            const ttsVoice = document.getElementById('ttsVoice').value;
+            const useTts = document.getElementById('useTts').value === 'true';
+            
+            if (!knowledgePoint) {
+                alert('Please enter a knowledge point');
+                return;
+            }
+            
+            document.getElementById('progressSection').classList.remove('hidden');
+            document.getElementById('logSection').classList.remove('hidden');
+            document.getElementById('videoSection').classList.add('hidden');
+            
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+            btn.style.opacity = '0.7';
+            
+            clearLogs();
+            updateProgress(0, 'Submitting task...');
+            addLog(`Topic: ${knowledgePoint}`, 'info');
+            
+            try {
+                const response = await fetch(`${serverUrl}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        knowledge_point: knowledgePoint,
+                        api: apiModel,
+                        use_tts: useTts,
+                        tts_voice: ttsVoice
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Failed to start generation');
+                
+                const data = await response.json();
+                currentTaskId = data.task_id;
+                addLog(`Task started: ${currentTaskId.slice(0, 8)}...`, 'success');
+                connectSSE(currentTaskId);
+            } catch (error) {
+                addLog(`Error: ${error.message}`, 'error');
+                updateProgress(0, error.message);
+                resetButton();
+            }
+        }
+
+        function connectSSE(taskId) {
+            const serverUrl = getServerUrl();
+            if (eventSource) eventSource.close();
+            
+            eventSource = new EventSource(`${serverUrl}/api/progress/${taskId}`);
+            
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.heartbeat) return;
+                if (data.error) { addLog(`Error: ${data.error}`, 'error'); return; }
+                
+                if (data.progress !== undefined && data.message) {
+                    updateProgress(data.progress, data.message);
+                    addLog(data.message, data.progress >= 100 ? 'success' : 'info');
+                }
+                
+                if (data.done) {
+                    eventSource.close();
+                    if (data.status === 'completed' && data.video_url) {
+                        showVideo(`${serverUrl}${data.video_url}`);
+                        addLog('Video generation complete', 'success');
+                    } else if (data.error) {
+                        addLog(`Failed: ${data.error}`, 'error');
+                    }
+                    resetButton();
+                }
+            };
+            
+            eventSource.onerror = () => {
+                setTimeout(() => {
+                    if (eventSource.readyState === EventSource.CLOSED) checkTaskStatus(taskId);
+                }, 2000);
+            };
+        }
+
+        async function checkTaskStatus(taskId) {
+            const serverUrl = getServerUrl();
+            try {
+                const response = await fetch(`${serverUrl}/api/status/${taskId}`);
+                const data = await response.json();
+                
+                if (data.status === 'completed' && data.video_url) {
+                    showVideo(`${serverUrl}${data.video_url}`);
+                    addLog('Video generation complete', 'success');
+                } else if (data.status === 'failed') {
+                    addLog(`Failed: ${data.error}`, 'error');
+                }
+                resetButton();
+            } catch (error) {
+                addLog(`Status check failed`, 'error');
+                resetButton();
+            }
+        }
+
+        function showVideo(videoUrl) {
+            const videoSection = document.getElementById('videoSection');
+            document.getElementById('videoPlayer').src = videoUrl;
+            document.getElementById('downloadLink').href = videoUrl;
+            videoSection.classList.remove('hidden');
+            updateProgress(100, 'Complete');
+            videoSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function resetButton() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = false;
+            btn.textContent = 'Start Generation';
+            btn.style.opacity = '1';
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        window.onload = () => setTimeout(testConnection, 500);
+    </script>
+</body>
+</html>

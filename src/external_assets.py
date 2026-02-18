@@ -37,7 +37,7 @@ class SmartSVGDownloader:
                 filepath = self._download_element(el)
                 if filepath:
                     downloaded_assets[el] = filepath
-                    print(f"✓ 下载: {el} -> {filepath}")
+                    print(f"✓ Downloaded: {el} -> {filepath}")
 
         prompt = self._build_enhancement_prompt(storyboard, downloaded_assets)
         api_response = self.api_function(prompt, max_tokens=2000)[0]

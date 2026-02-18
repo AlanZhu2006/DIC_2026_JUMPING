@@ -1,4 +1,5 @@
 import re
+import sys
 import argparse
 import json
 import time
@@ -67,6 +68,7 @@ class TeachingVideoAgent:
         knowledge_point,
         folder="CASES",
         cfg: Optional[RunConfig] = None,
+        manim_path: Optional[str] = None,
     ):
         """1. Global parameter"""
         self.learning_topic = knowledge_point
@@ -90,6 +92,15 @@ class TeachingVideoAgent:
         self.tts_model = cfg.tts_model
         self.tts_speed = cfg.tts_speed
         self.tts_generator = None  # Lazy initialization
+
+        # Manim path - use provided path or calculate from current Python executable
+        # This is important for ProcessPoolExecutor where sys.executable may differ
+        if manim_path:
+            self.manim_path = manim_path
+        else:
+            import platform
+            manim_exe = "manim.exe" if platform.system() == "Windows" else "manim"
+            self.manim_path = str(Path(sys.executable).parent / manim_exe)
 
         """2. Path for output"""
         self.folder = folder
@@ -146,8 +157,8 @@ class TeachingVideoAgent:
         return response
 
     def get_serializable_state(self):
-        """返回可以序列化保存的Agent状态"""
-        return {"idx": self.idx, "knowledge_point": self.learning_topic, "folder": self.folder, "cfg": self.cfg}
+        """Returns serializable Agent state for saving"""
+        return {"idx": self.idx, "knowledge_point": self.learning_topic, "folder": self.folder, "cfg": self.cfg, "manim_path": self.manim_path}
 
     def generate_outline(self) -> TeachingOutline:
         outline_file = self.output_dir / "outline.json"
@@ -378,12 +389,20 @@ class TeachingVideoAgent:
             try:
                 scene_name = f"{section_id.title().replace('_', '')}Scene"
                 code_file = f"{section_id}.py"
-                # Use sys.executable to get the Python path, then derive manim path
-                import sys
-                import platform
-                manim_exe = "manim.exe" if platform.system() == "Windows" else "manim"
-                manim_path = str(Path(sys.executable).parent / manim_exe)
-                cmd = [manim_path, "-ql", str(code_file), scene_name]
+                # Use pre-calculated manim path (avoids ProcessPoolExecutor issues)
+                # Debug: verify manim path exists
+                if not Path(self.manim_path).exists():
+                    print(f"⚠️ manim not found at: {self.manim_path}")
+                    # Fallback: try to find manim in PATH
+                    import shutil
+                    manim_in_path = shutil.which("manim")
+                    if manim_in_path:
+                        self.manim_path = manim_in_path
+                        print(f"📍 Using manim from PATH: {self.manim_path}")
+                    else:
+                        print(f"❌ manim not found in PATH either")
+                
+                cmd = [self.manim_path, "-ql", str(code_file), scene_name]
 
                 result = subprocess.run(cmd, capture_output=True, text=True, cwd=self.output_dir, timeout=180)
 
@@ -664,7 +683,7 @@ class TeachingVideoAgent:
         except Exception as e:
             print(f"❌ Critical error in parallel rendering process: {str(e)}")
 
-        # 更新结果并输出统计信息
+        # Update results and output statistics
         self.section_videos.update(results)
 
         total_sections = len(self.sections)

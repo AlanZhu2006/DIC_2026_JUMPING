@@ -192,7 +192,7 @@ class SelectiveKnowledgeUnlearning:
         print("Step 2: Unlearning-only")
         post_unlearn_score, post_unlearn_resps = self.assess_with_unlearning(concept, questions)
         print(f"Unlearning-only score: {post_unlearn_score:.3f}")
-        unlearn_success = post_unlearn_score <= pre_score  # 简单启发式
+        unlearn_success = post_unlearn_score <= pre_score  # Simple heuristic
 
         # Step 3：Unlearning + Video
         print("Step 3: Unlearning + Video")
@@ -310,7 +310,7 @@ def main():
         default=None,
         help="Optional subset of concepts to evaluate. If not set, evaluate all in JSON.",
     )
-    # TODO: CASES 下的路径
+    # TODO: Path under CASES directory
     parser.add_argument(
         "--base_dir",
         type=str,

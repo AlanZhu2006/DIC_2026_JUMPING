@@ -1,5 +1,4 @@
 # PowerShell script to run single knowledge point test
-# PowerShell 脚本运行单知识点测试
 
 $PY = "python"
 $ENTRY = "agent.py"

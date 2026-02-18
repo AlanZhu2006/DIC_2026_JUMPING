@@ -1,9 +1,7 @@
 """
 API Connection Test Script
-API 连接测试脚本
 
 This script tests the API connections configured in api_config.json
-此脚本测试 api_config.json 中配置的 API 连接
 """
 
 import json
@@ -23,7 +21,7 @@ try:
     )
 except ImportError as e:
     print(f"❌ Import error: {e}")
-    print("请确保在 src/ 目录下运行此脚本")
+    print("Please make sure to run this script from the src/ directory")
     sys.exit(1)
 
 

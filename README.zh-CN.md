@@ -36,6 +36,28 @@
 
 ## ✅ 部署状态
 
+### 最新更新 (2026-02-18)
+
+- ✅ **Web UI 全新设计** - 专业深色主题，简约图标，清爽布局
+- ✅ **GitHub Pages 已部署** - Web UI 现已上线：[https://AlanZhu2006.github.io/DIC_2026_JUMPING/](https://AlanZhu2006.github.io/DIC_2026_JUMPING/)
+- ✅ API 服务启动时会自动清理目标端口，避免残留进程占用
+- ✅ 新增 `start_server.ps1`，一键清端口并启动 API 服务
+- ✅ Web UI 新增使用教程和服务器帮助指引
+- ✅ 代码注释与用户提示已统一为英文（中文 README 除外）
+
+### 🌐 在线演示
+
+**Web UI**: [https://AlanZhu2006.github.io/DIC_2026_JUMPING/](https://AlanZhu2006.github.io/DIC_2026_JUMPING/)
+
+Web 界面功能：
+- 🎬 输入任意知识点，一键生成教学视频
+- 🤖 选择 AI 模型（GPT-5.2、GPT-4o、Claude）
+- 🎙️ 添加 TTS 语音旁白，支持多种声音
+- 📊 实时查看生成进度
+- 📥 直接下载生成的视频
+
+> **注意**：Web UI 需要本地后端服务运行，请参考 [快速开始](#-快速开始) 进行配置。
+
 ### 已完成部署步骤
 
 - [x] **阶段 1：环境准备**
@@ -79,6 +101,14 @@
   - ✅ 成功率：100%（知识点处理），100%（使用 GPT-5.2 的视频渲染）
   - ✅ 生成文件：大纲、分镜、Manim 代码、TTS 音频和最终视频
 
+- [x] **阶段 8：Web UI 与 GitHub Pages**
+  - ✅ 现代化 Web 界面 (`web/index.html`) 采用 Tailwind CSS
+  - ✅ 通过 Server-Sent Events (SSE) 实时追踪进度
+  - ✅ GitHub Pages 已部署，支持公开访问
+  - ✅ 服务器帮助弹窗，包含端口清理说明
+  - ✅ 模型和声音选择下拉框
+  - ✅ 生成完成后直接下载视频
+
 ### 测试结果总结
 
 **最新测试** (2026-02-16) - GPT-5.2 + TTS:
@@ -111,6 +141,13 @@
 # 激活后验证
 python --version  # 应该显示 Python 3.11.9
 pip --version     # 应该显示 pip 26.0
+```
+
+#### 启动 API 服务（Windows PowerShell）
+
+```powershell
+# 自动清理 8000 端口并启动 API 服务
+./start_server.ps1
 ```
 
 #### 系统要求
@@ -679,8 +716,17 @@ def visualkiwi_mcp_tool(user_prompt: str) -> Dict:
 - [x] Manim 验证和示例
 - [x] TTS 语音集成（OpenAI TTS API）
 - [x] 完整音视频流水线
+- [x] 实现视频生成 REST API（FastAPI + SSE）
+- [x] Web UI 实时进度追踪
 - [ ] 创建 MCP 服务器接口
-- [ ] 实现视频生成 REST API
+
+### 阶段 1.5：增强功能（🔄 下一步计划）
+- [ ] 用户认证系统
+- [ ] 云端部署（Azure / Vercel）
+- [ ] 更多示例视频模板
+- [ ] 视频质量选项（480p / 720p / 1080p）
+- [ ] 批量视频生成
+- [ ] 视频缓存与 CDN 分发
 
 ### 阶段 2：交互式组件
 - [ ] 开发交互式 Canvas 组件

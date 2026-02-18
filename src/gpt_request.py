@@ -1025,7 +1025,7 @@ def request_gpt41_token(prompt, log_id=None, max_tokens=1000, max_retries=3):
         except Exception as e:
             retry_count += 1
             if retry_count >= max_retries:
-                # 即使失败也返回，以便主程序可以继续
+                # Return even on failure so main program can continue
                 print(f"Failed after {max_retries} attempts. Last error: {str(e)}")
                 return None, usage_info
 
@@ -1069,7 +1069,7 @@ def request_gpt41_img(prompt, image_path=None, log_id=None, max_tokens=1000, max
     extra_headers = {"X-TT-LOGID": log_id} if "openai.com" not in base_url.lower() else {}
 
     if image_path:
-        # 检查图片路径是否存在
+        # Check if image path exists
         if not os.path.isfile(image_path):
             raise FileNotFoundError(f"Image file not found: {image_path}")
 
@@ -1112,25 +1112,25 @@ def request_gpt41_img(prompt, image_path=None, log_id=None, max_tokens=1000, max
 if __name__ == "__main__":
 
     # Gemini
-    # response_gemini = request_gemini("上海天气怎么样？")
+    # response_gemini = request_gemini("What is the weather in Shanghai?")
     # print(response_gemini.model_dump_json())
 
     # # GPT-4o
-    # response_gpt4o = request_gpt4o("上海天气怎么样？")
+    # response_gpt4o = request_gpt4o("What is the weather in Shanghai?")
     # print(response_gpt4o)
 
     # # o4-mini
-    # response_o4mini = request_o4mini("上海天气怎么样？")
+    # response_o4mini = request_o4mini("What is the weather in Shanghai?")
     # print(response_o4mini.model_dump_json())
 
     # # GPT-4.1
-    response_gpt41 = request_gpt41("上海天气怎么样？")
+    response_gpt41 = request_gpt41("What is the weather in Shanghai?")
     print(response_gpt41.model_dump_json())
 
     # GPT-5
-    # response_gpt5 = request_gpt5("新加坡天气怎么样？")
+    # response_gpt5 = request_gpt5("What is the weather in Singapore?")
     # print(response_gpt5.model_dump_json())
 
     # # Claude
-    # response_claude = request_claude_token("新加坡天气怎么样？")
+    # response_claude = request_claude_token("What is the weather in Singapore?")
     # print(response_claude)
